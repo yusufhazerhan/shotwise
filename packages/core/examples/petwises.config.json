@@ -1,0 +1,70 @@
+{
+  "$schema": "../shotwise.schema.json",
+  "_comment": "Petwises EN preset — re-renders all 10 marketing screenshots from Shotwise. Source path is relative to this config file.",
+  "theme": "cream",
+  "canvas": "iphone67",
+  "rawDir": "../../../../petwise/marketing/screenshots/raw/en",
+  "outDir": "./out/petwises-en",
+  "screens": [
+    {
+      "source": "home.png",
+      "out": "01_home.png",
+      "title": "Smarter training,\n5 minutes a day",
+      "accent": "5 minutes"
+    },
+    {
+      "source": "../recap/en/recap_intro.png",
+      "out": "02_recap_intro.png",
+      "title": "Every month, a story to share",
+      "accent": "story"
+    },
+    {
+      "source": "../recap/en/recap_close.png",
+      "out": "03_recap_close.png",
+      "title": "Built together, day by day",
+      "accent": "together"
+    },
+    {
+      "source": "lessons.png",
+      "out": "04_lessons.png",
+      "title": "200+ lessons by real behaviorists",
+      "accent": "200+"
+    },
+    {
+      "source": "ai_companion.png",
+      "out": "05_ai_companion.png",
+      "title": "An expert coach in your pocket, 24/7",
+      "accent": "24/7"
+    },
+    {
+      "source": "walks.png",
+      "out": "06_walks.png",
+      "title": "Every walk, every memory — saved",
+      "accent": "memory"
+    },
+    {
+      "source": "care_overview.png",
+      "out": "07_care.png",
+      "title": "Vaccines, feeding, care — all in one",
+      "accent": "all in one"
+    },
+    {
+      "source": "care_guide.png",
+      "out": "08_care_guide.png",
+      "title": "Know what your pet needs, when",
+      "accent": "what"
+    },
+    {
+      "source": "progress.png",
+      "out": "09_progress.png",
+      "title": "See real progress, every step",
+      "accent": "real"
+    },
+    {
+      "source": "profile.png",
+      "out": "10_profile.png",
+      "title": "All your pets.\nOne home.",
+      "accent": "One home"
+    }
+  ]
+}

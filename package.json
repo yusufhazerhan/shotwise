@@ -1,0 +1,19 @@
+{
+  "name": "shotwise",
+  "version": "0.0.1",
+  "private": true,
+  "description": "AI-powered App Store screenshot generator",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  }
+}
