@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { Button, DropZone } from "@shotwise/ui-primitives";
+import { DropZone } from "@shotwise/ui-primitives";
 import type { Project, Screenshot } from "@shotwise/db";
 import { uploadScreenshot } from "@/lib/upload-screenshot";
 
@@ -25,11 +25,7 @@ export function Step2Upload({
     try {
       const subset = files.slice(0, remaining);
       for (let i = 0; i < subset.length; i++) {
-        await uploadScreenshot({
-          projectId: project.id,
-          file: subset[i]!,
-          order: screenshots.length + i,
-        });
+        await uploadScreenshot({ projectId: project.id, file: subset[i]!, order: screenshots.length + i });
       }
       await onUpload();
     } finally {
@@ -39,40 +35,51 @@ export function Step2Upload({
 
   return (
     <div data-slot="wizard-step-2">
-      <h1 style={{ margin: 0, fontSize: "1.5rem" }}>Upload screenshots</h1>
-      <p style={{ color: "var(--muted-fg)" }}>1 to 10 screens · PNG / JPG / WebP, up to 20 MB each.</p>
+      <span className="step-eyebrow">// Step 2 — Upload screenshots</span>
+      <h1 className="step-h">Drop your screenshots.</h1>
+      <p className="step-sub">PNG / JPG / WebP · up to 10 files · max 20 MB each. Drag to reorder.</p>
 
       <DropZone
+        className="uploader"
         accept={{ "image/png": [".png"], "image/jpeg": [".jpg", ".jpeg"], "image/webp": [".webp"] }}
         maxSize={20 * 1024 * 1024}
         multiple
         onDrop={(f) => handle(f as File[])}
         disabled={busy || remaining === 0}
       >
-        <p style={{ margin: 0 }}>
+        <div className="icon">⇣</div>
+        <h4>
           {remaining === 0
             ? "Maximum 10 screenshots reached"
             : busy
             ? "Uploading…"
-            : "Drag & drop or click to add screens"}
-        </p>
+            : "Drop screenshots here, or click to browse"}
+        </h4>
+        <p>PNG or JPG · up to 10 files · max 20 MB each</p>
       </DropZone>
 
       {screenshots.length > 0 && (
-        <ul data-slot="wizard-upload-list" style={{ listStyle: "none", padding: 0, marginTop: "1rem", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "0.5rem" }}>
+        <div className="upload-grid" data-slot="wizard-upload-list">
           {screenshots.map((s, i) => (
-            <li key={s.id} className="sw-card sw-card-body" style={{ padding: "0.6rem", fontSize: "0.85rem" }}>
-              #{i + 1} · {s.status}
-            </li>
+            <div key={s.id} className="upload-card">
+              <div className="thumb" />
+              <div className="nm">Screen {i + 1}</div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
 
-      <div style={{ marginTop: "1.25rem", display: "flex", gap: "0.5rem", justifyContent: "space-between" }}>
-        <Button variant="ghost" onClick={onBack}>← Back</Button>
-        <Button variant="primary" disabled={screenshots.length === 0} onClick={onContinue}>
+      {screenshots.length > 0 && (
+        <p style={{ marginTop: 14, fontSize: "12.5px", color: "var(--ink-mute)", fontFamily: "var(--font-mono)" }}>
+          {screenshots.length} of 10 uploaded
+        </p>
+      )}
+
+      <div style={{ marginTop: "1.5rem", display: "flex", gap: "0.5rem", justifyContent: "space-between" }}>
+        <button className="btn btn-ghost" onClick={onBack}>← Back</button>
+        <button className="btn btn-primary" disabled={screenshots.length === 0} onClick={onContinue}>
           Continue →
-        </Button>
+        </button>
       </div>
     </div>
   );

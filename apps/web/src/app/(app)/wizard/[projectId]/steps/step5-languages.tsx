@@ -1,6 +1,5 @@
 "use client";
 import * as React from "react";
-import { Button, Checkbox } from "@shotwise/ui-primitives";
 import { LOCALES, LOCALE_LABELS, type Locale } from "@shotwise/types";
 import type { Project } from "@shotwise/db";
 
@@ -24,7 +23,7 @@ export function Step5Languages({
       const next = new Set(prev);
       if (next.has(l)) next.delete(l);
       else next.add(l);
-      if (!next.has("en")) next.add("en"); // always include source
+      if (!next.has("en")) next.add("en");
       return next;
     });
   }
@@ -40,23 +39,47 @@ export function Step5Languages({
 
   return (
     <div data-slot="wizard-step-5">
-      <h1 style={{ margin: 0, fontSize: "1.5rem" }}>Pick languages</h1>
-      <p style={{ color: "var(--muted-fg)" }}>EN is always included. Translations cost no extra credits.</p>
+      <span className="step-eyebrow">// Step 5 — Pick your style</span>
+      <h1 className="step-h">Choose languages.</h1>
+      <p className="step-sub">EN is always included. Translations cost no extra credits — they&apos;re included in your export.</p>
 
-      <div data-slot="lang-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.5rem", marginTop: "1rem" }}>
-        {LOCALES.map((l) => (
-          <label key={l} data-locale={l} className="sw-card sw-card-body" style={{ display: "flex", gap: "0.5rem", alignItems: "center", cursor: "pointer" }}>
-            <Checkbox checked={langs.has(l)} onCheckedChange={() => toggle(l)} />
-            <span>{LOCALE_LABELS[l]}</span>
-          </label>
-        ))}
+      <div className="lang-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem", marginTop: "0.5rem" }}>
+        {LOCALES.map((l) => {
+          const on = langs.has(l);
+          return (
+            <label
+              key={l}
+              style={{
+                display: "flex", alignItems: "center", gap: 10, cursor: "pointer",
+                background: "white", border: `1.5px solid ${on ? "var(--ink)" : "var(--line)"}`,
+                borderRadius: 10, padding: "10px 12px",
+                transition: "all .15s ease",
+              }}
+              onClick={() => toggle(l)}
+            >
+              <input
+                type="checkbox"
+                checked={on}
+                onChange={() => toggle(l)}
+                style={{ accentColor: "var(--ink)", width: 15, height: 15 }}
+              />
+              <span style={{ fontSize: 14, fontWeight: on ? 600 : 400, color: on ? "var(--ink)" : "var(--ink-soft)" }}>
+                {LOCALE_LABELS[l]}
+              </span>
+            </label>
+          );
+        })}
       </div>
 
-      <div style={{ marginTop: "1.25rem", display: "flex", gap: "0.5rem", justifyContent: "space-between" }}>
-        <Button variant="ghost" onClick={onBack}>← Back</Button>
-        <Button
-          variant="primary"
-          loading={submitting}
+      <p style={{ marginTop: 12, fontSize: 13, color: "var(--ink-mute)", fontFamily: "var(--font-mono)" }}>
+        {langs.size} language{langs.size === 1 ? "" : "s"} selected
+      </p>
+
+      <div style={{ marginTop: "1.5rem", display: "flex", gap: "0.5rem", justifyContent: "space-between" }}>
+        <button className="btn btn-ghost" onClick={onBack}>← Back</button>
+        <button
+          className="btn btn-primary"
+          disabled={submitting}
           onClick={async () => {
             setSubmitting(true);
             try {
@@ -67,8 +90,8 @@ export function Step5Languages({
             }
           }}
         >
-          Continue →
-        </Button>
+          {submitting ? "Translating…" : "Continue →"}
+        </button>
       </div>
     </div>
   );

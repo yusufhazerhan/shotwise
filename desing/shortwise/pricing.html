@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pricing — Shotwise</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="brand.css">
+<style>
+  .pr-hero { text-align: center; padding: 88px 0 16px; }
+  .pr-hero h1 { font-size: 60px; line-height: 1.02; max-width: 900px; margin: 0 auto; }
+  .pr-hero h1 em { font-style: normal; color: var(--coral); }
+  .pr-hero p { margin: 18px auto 0; font-size: 17.5px; max-width: 580px; color: var(--ink-soft); }
+
+  .billing-toggle {
+    display:flex; align-items:center; justify-content: center; gap: 14px;
+    margin-top: 36px;
+  }
+  .seg-toggle {
+    display:flex; align-items:center; background: var(--cream-2); padding: 4px;
+    border-radius: 999px; border: 1px solid var(--line);
+  }
+  .seg-toggle button {
+    background: transparent; border: 0; padding: 8px 18px; border-radius: 999px;
+    color: var(--ink-soft); cursor: pointer; font-weight: 600; font-size: 13.5px;
+    transition: all .15s;
+  }
+  .seg-toggle button.on { background: var(--ink); color: var(--cream); }
+  .save-badge { font-size: 12px; color: var(--coral-2); font-weight: 600; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.02em; }
+
+  /* Plan grid */
+  .pr-grid {
+    display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    padding: 48px 0;
+  }
+  .plan {
+    background: white; border: 1px solid var(--line); border-radius: 20px;
+    padding: 32px 30px; display:flex; flex-direction: column; gap: 18px;
+    position: relative;
+  }
+  .plan.feat {
+    border: 1.5px solid var(--ink);
+    box-shadow: var(--shadow-lg);
+    transform: scale(1.025);
+    background: linear-gradient(180deg, #FFF 0%, #FBF6EC 100%);
+  }
+  .plan-name { font-size: 13.5px; font-weight: 700; color: var(--ink-2); letter-spacing: 0.01em; display:flex; align-items: center; gap: 8px;}
+  .plan h3 { font-size: 18px; }
+  .plan .price { display:flex; align-items: baseline; gap: 6px; margin: 4px 0; }
+  .plan .price .amt { font-size: 52px; font-weight: 800; letter-spacing: -0.04em; color: var(--ink); line-height: 1; }
+  .plan .price .per { font-size: 14px; color: var(--ink-mute); }
+  .plan .price-alt { font-size: 12px; color: var(--ink-mute); font-family: 'JetBrains Mono', monospace; }
+  .plan p.lead { font-size: 14px; color: var(--ink-soft); line-height: 1.45; }
+  .plan ul { list-style: none; padding: 0; margin: 4px 0 0; display:flex; flex-direction: column; gap: 11px; }
+  .plan ul li {
+    font-size: 14px; color: var(--ink-soft);
+    display:flex; gap: 10px; line-height: 1.4;
+  }
+  .plan ul li::before {
+    content: '✓'; color: var(--coral); font-weight: 800;
+    flex-shrink: 0;
+  }
+  .plan ul li.muted { color: var(--ink-mute); }
+  .plan ul li.muted::before { content: '–'; color: var(--ink-mute); }
+  .plan-badge {
+    position:absolute; top:-14px; right: 24px;
+    background: var(--coral); color: white;
+    font-size: 11px; font-weight: 700;
+    padding: 6px 12px; border-radius: 999px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    box-shadow: var(--shadow-sm);
+  }
+  .plan .cta { margin-top: auto; }
+  .plan .cta .btn { width: 100%; justify-content: center; }
+  .plan .micro { font-size: 11.5px; color: var(--ink-mute); text-align: center; margin-top: 8px; font-family: 'JetBrains Mono', monospace; }
+
+  /* Comparison table */
+  .compare {
+    padding: 48px 0 32px;
+  }
+  .compare-head { text-align: center; margin-bottom: 32px; }
+  .compare-head .eyebrow { font-family:'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.08em; color: var(--coral-2); text-transform: uppercase; font-weight: 500; }
+  .compare-head h2 { margin-top: 10px; font-size: 36px; }
+
+  .ctable {
+    background: white; border: 1px solid var(--line); border-radius: 20px;
+    overflow: hidden;
+  }
+  .ctable .crow {
+    display:grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    align-items: center;
+    border-top: 1px solid var(--line);
+  }
+  .ctable .crow:first-child { border-top: 0; background: var(--cream-2); }
+  .ctable .crow > div { padding: 14px 20px; font-size: 14px; }
+  .ctable .crow .ft { color: var(--ink); font-weight: 500; }
+  .ctable .crow .val { text-align: center; color: var(--ink-soft); }
+  .ctable .crow .val.yes { color: var(--ink); font-weight: 600; }
+  .ctable .crow .val.no { color: var(--ink-mute); }
+  .ctable .crow.head > div { font-weight: 700; font-size: 13px; letter-spacing: 0.02em; color: var(--ink); padding: 16px 20px; }
+  .ctable .crow.head .pro { background: linear-gradient(180deg, rgba(217,119,87,0.08), transparent); }
+  .ctable .crow.section > div {
+    background: var(--cream); font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ink-mute); font-weight: 600;
+    padding: 12px 20px;
+  }
+  .ctable .crow.section > div:not(:first-child) { padding: 0; }
+
+  /* Trust logos */
+  .trust-block { padding: 48px 0; text-align: center; }
+  .trust-text { font-size: 13px; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; }
+  .logo-cloud { display: grid; grid-template-columns: repeat(6, 1fr); gap: 28px; align-items: center; margin-top: 22px; opacity: 0.65; }
+  .logo-cloud .lc { font-weight: 800; font-size: 17px; color: var(--ink-soft); letter-spacing: -0.02em; }
+
+  /* FAQ */
+  .pr-faq { padding: 48px 0 80px; }
+  .pr-faq h2 { font-size: 32px; text-align: center; margin-bottom: 32px; }
+  .pr-faq-grid {
+    display:grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 920px; margin: 0 auto;
+  }
+  .pr-faq-grid details {
+    background: white; border:1px solid var(--line); border-radius: 14px; padding: 18px 22px;
+  }
+  .pr-faq-grid summary { cursor: pointer; list-style: none; display:flex; align-items:center; justify-content: space-between; font-weight: 600; font-size: 15.5px; color: var(--ink); letter-spacing: -0.01em; }
+  .pr-faq-grid summary::-webkit-details-marker { display:none; }
+  .pr-faq-grid summary::after { content:'+'; font-size: 20px; font-weight: 400; color: var(--ink-mute); }
+  .pr-faq-grid details[open] summary::after { content:'−'; }
+  .pr-faq-grid details p { margin-top: 12px; font-size: 13.5px; line-height: 1.55; }
+
+  @media (max-width: 900px) {
+    .pr-grid { grid-template-columns: 1fr; }
+    .pr-faq-grid { grid-template-columns: 1fr; }
+    .ctable .crow { grid-template-columns: 1.5fr 1fr 1fr 1fr; }
+    .pr-hero h1 { font-size: 44px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="shot-nav" data-screen-label="05 Pricing nav">
+  <div class="container shot-nav-inner">
+    <a href="landing.html" class="logo"><span class="logo-mark">S</span> shotwise</a>
+    <div class="spacer"></div>
+    <div class="shot-nav-links">
+      <a href="landing.html">Home</a>
+      <a href="editor.html">Editor</a>
+      <a href="wizard.html">Wizard</a>
+      <a href="pricing.html" class="active">Pricing</a>
+    </div>
+    <a href="auth.html" class="btn btn-ghost btn-sm">Sign in</a>
+    <a href="wizard.html" class="btn btn-primary btn-sm">Start free</a>
+  </div>
+</nav>
+
+<main data-screen-label="05 Pricing">
+  <section class="pr-hero container">
+    <span class="pill pill-coral pill-dot" style="margin-bottom: 18px;">Simple, indie-friendly pricing</span>
+    <h1>Choose your plan. <em>Start free.</em></h1>
+    <p>Three exports on the house. Upgrade when you're ready to ship in nine languages.</p>
+
+    <div class="billing-toggle">
+      <div class="seg-toggle" role="tablist">
+        <button class="on" id="monthlyBtn">Monthly</button>
+        <button id="annualBtn">Annual <span class="save-badge" style="margin-left:6px;">−20%</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Plans -->
+  <section class="container">
+    <div class="pr-grid">
+
+      <!-- FREE -->
+      <div class="plan">
+        <div class="plan-name">Free</div>
+        <h3>Try Shotwise</h3>
+        <div class="price"><span class="amt" data-monthly="$0" data-annual="$0">$0</span><span class="per">/ month</span></div>
+        <p class="price-alt">No card required</p>
+        <p class="lead">A taste of the product. Good enough to test on a single screen.</p>
+        <ul>
+          <li>3 exports per month</li>
+          <li>1 language (your choice)</li>
+          <li>Manual mode editor</li>
+          <li>Standard templates</li>
+          <li class="muted">Watermark on output</li>
+          <li class="muted">AI wizard locked</li>
+          <li class="muted">Brand kit locked</li>
+        </ul>
+        <div class="cta">
+          <a href="wizard.html" class="btn btn-ghost">Start free</a>
+          <div class="micro">no card, no trial</div>
+        </div>
+      </div>
+
+      <!-- PRO -->
+      <div class="plan feat">
+        <span class="plan-badge">Most popular</span>
+        <div class="plan-name">Pro <span class="pill pill-coral">★</span></div>
+        <h3>Ship a real app</h3>
+        <div class="price"><span class="amt" data-monthly="$19" data-annual="$15">$19</span><span class="per">/ month</span></div>
+        <p class="price-alt"><span id="proAlt">billed monthly</span></p>
+        <p class="lead">Everything an indie founder needs to ship multi-locale screenshots in one afternoon.</p>
+        <ul>
+          <li>Unlimited exports</li>
+          <li>All 9 languages</li>
+          <li>No watermark</li>
+          <li>AI wizard + AI titles</li>
+          <li>Brand kit (1 brand)</li>
+          <li>Priority email support</li>
+          <li>App Store Connect export</li>
+        </ul>
+        <div class="cta">
+          <a href="wizard.html" class="btn btn-primary">Start 7-day trial</a>
+          <div class="micro">cancel anytime · LemonSqueezy</div>
+        </div>
+      </div>
+
+      <!-- TEAM -->
+      <div class="plan">
+        <div class="plan-name">Team</div>
+        <h3>Multi-app studios</h3>
+        <div class="price"><span class="amt" data-monthly="$49" data-annual="$39">$49</span><span class="per">/ month</span></div>
+        <p class="price-alt">3 seats included · $12/seat after</p>
+        <p class="lead">Shared brand kits, multi-user workspace, and API access for teams shipping more than one product.</p>
+        <ul>
+          <li>3 team seats included</li>
+          <li>Everything in Pro</li>
+          <li>Shared brand kit (5 brands)</li>
+          <li>Multi-user workspace</li>
+          <li>API access</li>
+          <li>SSO (SAML) — Q3 2026</li>
+          <li>Dedicated Slack channel</li>
+        </ul>
+        <div class="cta">
+          <a href="#" class="btn btn-ghost">Contact sales</a>
+          <div class="micro">or self-serve in dashboard</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison table -->
+  <section class="compare container">
+    <div class="compare-head">
+      <span class="eyebrow">// Side by side</span>
+      <h2>Compare every feature.</h2>
+    </div>
+    <div class="ctable">
+      <div class="crow head">
+        <div>Feature</div>
+        <div style="text-align:center;">Free</div>
+        <div class="pro" style="text-align:center;">Pro</div>
+        <div style="text-align:center;">Team</div>
+      </div>
+
+      <div class="crow section">
+        <div>Core</div><div></div><div></div><div></div>
+      </div>
+      <div class="crow">
+        <div class="ft">Manual editor</div>
+        <div class="val yes">✓</div><div class="val yes">✓</div><div class="val yes">✓</div>
+      </div>
+      <div class="crow">
+        <div class="ft">AI Wizard</div>
+        <div class="val no">—</div><div class="val yes">✓</div><div class="val yes">✓</div>
+      </div>
+      <div class="crow">
+        <div class="ft">Exports per month</div>
+        <div class="val">3</div><div class="val yes">Unlimited</div><div class="val yes">Unlimited</div>
+      </div>
+      <div class="crow">
+        <div class="ft">Languages</div>
+        <div class="val">1</div><div class="val yes">9</div><div class="val yes">9 + custom</div>
+      </div>
+      <div class="crow">
+        <div class="ft">Watermark</div>
+        <div class="val no">Yes</div><div class="val yes">No</div><div class="val yes">No</div>
+      </div>
+
+      <div class="crow section">
+        <div>Brand & assets</div><div></div><div></div><div></div>
+      </div>
+      <div class="crow">
+        <div class="ft">Brand kits</div>
+        <div class="val no">—</div><div class="val yes">1</div><div class="val yes">5</div>
+      </div>
+      <div class="crow">
+        <div class="ft">Custom fonts</div>
+        <div class="val no">—</div><div class="val yes">✓</div><div class="val yes">✓</div>
+      </div>
+      <div class="crow">
+        <div class="ft">Reusable presets</div>
+        <div class="val">3</div><div class="val yes">Unlimited</div><div class="val yes">Shared</div>
+      </div>
+
+      <div class="crow section">
+        <div>Team & integrations</div><div></div><div></div><div></div>
+      </div>
+      <div class="crow">
+        <div class="ft">Team seats</div>
+        <div class="val">1</div><div class="val">1</div><div class="val yes">3 (+$12/seat)</div>
+      </div>
+      <div class="crow">
+        <div class="ft">Shared workspace</div>
+        <div class="val no">—</div><div class="val no">—</div><div class="val yes">✓</div>
+      </div>
+      <div class="crow">
+        <div class="ft">API access</div>
+        <div class="val no">—</div><div class="val no">—</div><div class="val yes">✓</div>
+      </div>
+      <div class="crow">
+        <div class="ft">App Store Connect export</div>
+        <div class="val no">—</div><div class="val yes">✓</div><div class="val yes">✓</div>
+      </div>
+
+      <div class="crow section">
+        <div>Support</div><div></div><div></div><div></div>
+      </div>
+      <div class="crow">
+        <div class="ft">Support channel</div>
+        <div class="val">Community</div><div class="val yes">Priority email</div><div class="val yes">Slack + email</div>
+      </div>
+      <div class="crow">
+        <div class="ft">Onboarding</div>
+        <div class="val">Docs</div><div class="val">Docs + email</div><div class="val yes">30-min call</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust -->
+  <section class="trust-block container">
+    <div class="trust-text">Shipping with Shotwise</div>
+    <div class="logo-cloud">
+      <div class="lc">Petwises</div>
+      <div class="lc">Habitloop</div>
+      <div class="lc">Tinydeck</div>
+      <div class="lc">Northcup</div>
+      <div class="lc">Plantsy</div>
+      <div class="lc">Mapnote</div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="pr-faq container">
+    <h2>Pricing questions</h2>
+    <div class="pr-faq-grid">
+      <details open>
+        <summary>Can I cancel anytime?</summary>
+        <p>Yes — one click in the dashboard, no email required. Annual plans are pro-rated for refund within 14 days of renewal.</p>
+      </details>
+      <details>
+        <summary>Do you offer refunds?</summary>
+        <p>The 7-day Pro trial is free and cancelable. After that, we refund any full month on request within 30 days, no questions asked.</p>
+      </details>
+      <details>
+        <summary>What payment methods?</summary>
+        <p>Card, Apple Pay, Google Pay, and SEPA — billed through LemonSqueezy, who handles VAT for EU customers.</p>
+      </details>
+      <details>
+        <summary>Student or non-profit discount?</summary>
+        <p>50% off Pro for students with an .edu address and for registered non-profits. Email us with proof.</p>
+      </details>
+      <details>
+        <summary>What counts as an "export"?</summary>
+        <p>One project ZIP, regardless of how many screens or languages are inside. Free is capped at 3 ZIPs per month.</p>
+      </details>
+      <details>
+        <summary>What's coming next?</summary>
+        <p>API access (Team) is live; Figma plugin, custom language packs, and SSO are in flight for Q3.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="container" style="padding: 0 28px 80px;">
+    <div style="background: var(--ink); color: var(--cream); border-radius: 24px; padding: 56px; display:flex; align-items:center; justify-content:space-between; gap: 40px;">
+      <div>
+        <h2 style="color: var(--cream); font-size: 36px;">Free tier is free forever.</h2>
+        <p style="color: rgba(245,239,230,0.7); margin-top: 10px;">Three exports a month. One language. Zero commitment.</p>
+      </div>
+      <a href="wizard.html" class="btn btn-coral btn-lg">Start free →</a>
+    </div>
+  </section>
+</main>
+
+<footer class="shot-foot">
+  <div class="container">
+    <div class="shot-foot-base">
+      <div>© 2026 Shotwise — made by indie devs, for indie devs.</div>
+      <div class="mono">pricing · v1.0.0-beta</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const monthly = document.getElementById('monthlyBtn');
+  const annual = document.getElementById('annualBtn');
+  function setMode(m) {
+    monthly.classList.toggle('on', m === 'monthly');
+    annual.classList.toggle('on', m === 'annual');
+    document.querySelectorAll('.amt').forEach(el => {
+      el.textContent = el.dataset[m] || el.textContent;
+    });
+    document.getElementById('proAlt').textContent = m === 'annual' ? 'billed yearly · save $48' : 'billed monthly';
+  }
+  monthly.addEventListener('click', () => setMode('monthly'));
+  annual.addEventListener('click',  () => setMode('annual'));
+</script>
+</body>
+</html>

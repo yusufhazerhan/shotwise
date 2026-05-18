@@ -2,7 +2,7 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "./cn.js";
 
-type Variant = "primary" | "secondary" | "ghost" | "danger";
+type Variant = "primary" | "secondary" | "ghost" | "danger" | "coral";
 type Size = "sm" | "md" | "lg";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -11,6 +11,20 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   asChild?: boolean;
   loading?: boolean;
 }
+
+const VARIANT_CLASS: Record<Variant, string> = {
+  primary: "btn-primary",
+  secondary: "btn-ghost",
+  ghost: "btn-ghost",
+  danger: "btn-danger",
+  coral: "btn-coral",
+};
+
+const SIZE_CLASS: Record<Size, string> = {
+  sm: "btn-sm",
+  md: "",
+  lg: "btn-lg",
+};
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { className, variant = "primary", size = "md", asChild, loading, disabled, children, ...rest },
@@ -25,7 +39,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       data-size={size}
       data-loading={loading ? "" : undefined}
       disabled={disabled || loading}
-      className={cn("sw-btn", `sw-btn--${variant}`, `sw-btn--${size}`, className)}
+      className={cn("btn", VARIANT_CLASS[variant], SIZE_CLASS[size], className)}
       {...rest}
     >
       {children}

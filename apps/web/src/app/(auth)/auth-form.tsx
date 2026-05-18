@@ -1,12 +1,10 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { authClient } from "@shotwise/auth/client";
-import { Button, Input, Label } from "@shotwise/ui-primitives";
 
 export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
-  const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next") ?? "/dashboard";
   const [email, setEmail] = React.useState("");
@@ -19,10 +17,7 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
     setStatus("sending");
     setError(null);
     try {
-      await authClient.signIn.magicLink({
-        email,
-        callbackURL: next,
-      });
+      await authClient.signIn.magicLink({ email, callbackURL: next });
       setStatus("sent");
     } catch (err) {
       setStatus("error");
@@ -35,52 +30,86 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
   }
 
   return (
-    <div data-slot="auth-form" className="sw-card sw-card-body">
-      <h1 style={{ margin: 0, fontSize: "1.5rem" }}>
-        {mode === "sign-in" ? "Sign in to Shotwise" : "Create your Shotwise account"}
-      </h1>
-      <p style={{ color: "var(--muted-fg)", marginTop: "0.4rem" }}>
-        We&apos;ll email you a magic link — no password.
-      </p>
+    <div data-slot="auth-form">
+      <div className="form-tabs">
+        <Link href="/sign-in" className={mode === "sign-in" ? "on" : ""}>
+          Sign in
+        </Link>
+        <Link href="/sign-up" className={mode === "sign-up" ? "on" : ""}>
+          Create account
+        </Link>
+      </div>
 
-      <form onSubmit={sendMagic} style={{ marginTop: "1.25rem" }}>
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          required
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={status === "sending" || status === "sent"}
-        />
-        <Button type="submit" variant="primary" loading={status === "sending"} style={{ width: "100%", marginTop: "0.75rem" }}>
-          {status === "sent" ? "Check your email" : "Send magic link"}
-        </Button>
-      </form>
+      {status === "sent" ? (
+        <div className="sent" data-slot="auth-success">
+          <div className="tick">✓</div>
+          <h3>Magic link sent</h3>
+          <p>
+            Check <strong>{email || "your inbox"}</strong>. Open the link on this device to
+            continue. It expires in 10 minutes.
+          </p>
+          <button
+            className="btn btn-ghost btn-sm"
+            style={{ marginTop: 18 }}
+            onClick={() => {
+              setStatus("idle");
+              setError(null);
+            }}
+          >
+            Use a different email
+          </button>
+        </div>
+      ) : (
+        <>
+          <h2>{mode === "sign-in" ? "Welcome back." : "Start with 5 free credits."}</h2>
+          <p className="sub">
+            {mode === "sign-in"
+              ? "Sign in with a magic link or your developer account."
+              : "We'll email you a magic link — no password, no nonsense."}
+          </p>
 
-      {status === "sent" && (
-        <p data-slot="auth-success" style={{ color: "var(--muted-fg)", marginTop: "1rem" }}>
-          Magic link sent to <strong>{email}</strong>. Open it on this device.
-        </p>
+          <form className="form-body" onSubmit={sendMagic}>
+            <div>
+              <label className="label" htmlFor="email">Email</label>
+              <input
+                id="email"
+                className="input"
+                type="email"
+                required
+                placeholder="you@studio.dev"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={status === "sending"}
+              />
+            </div>
+            <button type="submit" className="btn btn-primary" disabled={status === "sending"}>
+              {status === "sending" ? "Sending…" : "Send magic link →"}
+            </button>
+          </form>
+
+          {error && (
+            <p data-slot="auth-error" style={{ color: "#B91C1C", marginTop: 12, fontSize: 13 }}>
+              {error}
+            </p>
+          )}
+
+          {showGoogle && (
+            <>
+              <div className="divider">or continue with</div>
+              <div className="social">
+                <button onClick={signInWithGoogle} className="btn btn-ghost">
+                  Continue with Google
+                </button>
+              </div>
+            </>
+          )}
+
+          <p className="terms">
+            By {mode === "sign-in" ? "signing in" : "signing up"} you agree to our{" "}
+            <Link href="#">Terms</Link> and <Link href="#">Privacy Policy</Link>.
+          </p>
+        </>
       )}
-      {error && (
-        <p data-slot="auth-error" style={{ color: "#dc2626", marginTop: "1rem" }}>{error}</p>
-      )}
-
-      {showGoogle && (
-        <Button onClick={signInWithGoogle} variant="secondary" style={{ width: "100%", marginTop: "0.75rem" }}>
-          Continue with Google
-        </Button>
-      )}
-
-      <p style={{ marginTop: "1.25rem", fontSize: "0.85rem", color: "var(--muted-fg)" }}>
-        {mode === "sign-in" ? (
-          <>New here? <Link href="/sign-up">Create an account</Link></>
-        ) : (
-          <>Already have an account? <Link href="/sign-in">Sign in</Link></>
-        )}
-      </p>
     </div>
   );
 }

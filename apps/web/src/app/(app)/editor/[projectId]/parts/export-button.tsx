@@ -1,14 +1,21 @@
 "use client";
 import * as React from "react";
-import { Button, useToast, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogClose } from "@shotwise/ui-primitives";
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogClose } from "@shotwise/ui-primitives";
 import { useCredits } from "@/components/credit-balance";
 import type { Project } from "@shotwise/db";
 import type { Locale } from "@shotwise/types";
 import { useRouter } from "next/navigation";
 
-export function ExportButton({ project, screenshotCount }: { project: Project; screenshotCount: number }) {
+export function ExportButton({
+  project,
+  screenshotCount,
+  compact,
+}: {
+  project: Project;
+  screenshotCount: number;
+  compact?: boolean;
+}) {
   const { balance, refresh } = useCredits();
-  const toast = useToast();
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   const config = (project.config ?? {}) as { languages?: Locale[] };
@@ -26,16 +33,16 @@ export function ExportButton({ project, screenshotCount }: { project: Project; s
       });
       if (r.status === 402) {
         const data = await r.json();
-        toast.push({ title: "Out of credits", description: `${data.error?.balance ?? 0} / ${cost} required`, variant: "error" });
+        const avail = (data.error as { balance?: number } | null)?.balance ?? 0;
+        alert(`Not enough credits: ${avail} / ${cost} required. Buy more on the Credits page.`);
         router.push("/credits");
         return;
       }
       if (!r.ok) {
-        toast.push({ title: "Export failed", description: `Status ${r.status}`, variant: "error" });
+        alert(`Export failed (status ${r.status})`);
         return;
       }
       const data = (await r.json()) as { jobId: string };
-      toast.push({ title: "Export started", description: "Tracking progress…", variant: "success" });
       router.push(`/projects/${project.id}?job=${data.jobId}`);
       await refresh();
     } finally {
@@ -46,9 +53,12 @@ export function ExportButton({ project, screenshotCount }: { project: Project; s
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="primary" disabled={screenshotCount === 0 || loading} style={{ width: "100%" }}>
+        <button
+          className={compact ? "btn btn-primary btn-sm" : "btn btn-primary"}
+          disabled={screenshotCount === 0 || loading}
+        >
           Export ({cost} {cost === 1 ? "credit" : "credits"})
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Confirm export</DialogTitle>
@@ -57,21 +67,21 @@ export function ExportButton({ project, screenshotCount }: { project: Project; s
           <strong>{screenshotCount}</strong> screen{screenshotCount === 1 ? "" : "s"} across{" "}
           <strong>{languages.length}</strong> language{languages.length === 1 ? "" : "s"}.
         </DialogDescription>
-        <p style={{ marginTop: "0.5rem", color: "var(--muted-fg)" }}>
-          Balance: {balance} → {balance - cost} after.
+        <p style={{ marginTop: "0.5rem", color: "var(--ink-mute)", fontFamily: "var(--font-mono)", fontSize: 13 }}>
+          Balance: {balance} → {balance - cost} after
         </p>
         {!enough && (
-          <p style={{ color: "#dc2626", marginTop: "0.5rem" }}>
-            Not enough credits. <a href="/credits">Buy a pack</a>.
+          <p style={{ color: "#B91C1C", marginTop: "0.5rem", fontSize: 14 }}>
+            Not enough credits. <a href="/credits" style={{ textDecoration: "underline" }}>Buy a pack</a>.
           </p>
         )}
-        <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem", justifyContent: "flex-end" }}>
+        <div style={{ display: "flex", gap: "0.5rem", marginTop: "1.25rem", justifyContent: "flex-end" }}>
           <DialogClose asChild>
-            <Button variant="ghost">Cancel</Button>
+            <button className="btn btn-ghost">Cancel</button>
           </DialogClose>
-          <Button variant="primary" loading={loading} disabled={!enough} onClick={doExport}>
-            Confirm
-          </Button>
+          <button className="btn btn-primary" disabled={!enough || loading} onClick={doExport}>
+            {loading ? "Exporting…" : "Confirm export"}
+          </button>
         </div>
       </DialogContent>
     </Dialog>

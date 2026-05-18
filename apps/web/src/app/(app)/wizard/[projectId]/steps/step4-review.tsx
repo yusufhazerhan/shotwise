@@ -1,6 +1,5 @@
 "use client";
 import * as React from "react";
-import { Button, Input, Textarea, Label } from "@shotwise/ui-primitives";
 import type { Project, Screenshot } from "@shotwise/db";
 
 export function Step4ReviewTitles({
@@ -18,18 +17,19 @@ export function Step4ReviewTitles({
 }) {
   return (
     <div data-slot="wizard-step-4">
-      <h1 style={{ margin: 0, fontSize: "1.5rem" }}>Pick a title for each screen</h1>
-      <p style={{ color: "var(--muted-fg)" }}>3 AI suggestions per screen. Edit freely.</p>
+      <span className="step-eyebrow">// Step 4 — Review AI suggestions</span>
+      <h1 className="step-h">Pick a title for each screen.</h1>
+      <p className="step-sub">3 AI suggestions per screen. Choose one or write your own.</p>
 
-      <ul style={{ listStyle: "none", padding: 0, marginTop: "1.25rem", display: "grid", gap: "1rem" }}>
+      <div className="review-list">
         {screenshots.map((s, i) => (
           <ReviewCard key={s.id} index={i} project={project} screenshot={s} onPatch={onPatch} />
         ))}
-      </ul>
+      </div>
 
-      <div style={{ marginTop: "1.25rem", display: "flex", gap: "0.5rem", justifyContent: "space-between" }}>
-        <Button variant="ghost" onClick={onBack}>← Back</Button>
-        <Button variant="primary" onClick={onContinue}>Continue →</Button>
+      <div style={{ marginTop: "1.5rem", display: "flex", gap: "0.5rem", justifyContent: "space-between" }}>
+        <button className="btn btn-ghost" onClick={onBack}>← Back</button>
+        <button className="btn btn-primary" onClick={onContinue}>Continue →</button>
       </div>
     </div>
   );
@@ -68,9 +68,7 @@ function ReviewCard({
     await fetch(`/api/projects/${project.id}/screenshots/${screenshot.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        localized: { ...localized, en: { title: t, accent: a || undefined } },
-      }),
+      body: JSON.stringify({ localized: { ...localized, en: { title: t, accent: a || undefined } } }),
     });
     await onPatch();
   }
@@ -94,48 +92,56 @@ function ReviewCard({
   }
 
   return (
-    <li data-slot="wizard-review-card" className="sw-card sw-card-body">
-      <header style={{ display: "flex", justifyContent: "space-between" }}>
-        <strong>Screen #{index + 1}</strong>
-        <Button variant="ghost" size="sm" onClick={regenerate} loading={regen}>Regenerate</Button>
-      </header>
-      {analysis.description && (
-        <p style={{ color: "var(--muted-fg)", fontSize: "0.85rem", margin: "0.4rem 0" }}>{analysis.description}</p>
-      )}
-
-      <div data-slot="title-suggestions" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.4rem", marginTop: "0.5rem" }}>
-        {titles.map((t, i) => (
-          <button
-            type="button"
-            key={i}
-            data-slot="title-suggestion"
-            data-active={t === title ? "" : undefined}
-            onClick={() => pickTitle(t)}
-            className="sw-card sw-card-body"
-            style={{ cursor: "pointer", textAlign: "left", padding: "0.6rem", borderColor: t === title ? "var(--accent)" : undefined }}
-          >
-            <small style={{ color: "var(--muted-fg)" }}>Option {i + 1}</small>
-            <div style={{ whiteSpace: "pre-line" }}>{t}</div>
-          </button>
-        ))}
+    <div data-slot="wizard-review-card" className="review-card">
+      <div className="review-head">
+        <div className="review-thumb" />
+        <div className="review-nm">Screen #{index + 1}</div>
+        <button className="btn btn-ghost btn-sm" style={{ marginLeft: "auto" }} onClick={regenerate} disabled={regen}>
+          {regen ? "…" : "Regenerate"}
+        </button>
       </div>
+      <div className="review-body">
+        {analysis.description && (
+          <p style={{ color: "var(--ink-mute)", fontSize: 13, margin: "0 0 12px" }}>{analysis.description}</p>
+        )}
 
-      <Label htmlFor={`title-${screenshot.id}`} style={{ marginTop: "0.6rem" }}>Or write your own</Label>
-      <Textarea
-        id={`title-${screenshot.id}`}
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        onBlur={() => save(title, accent)}
-        rows={2}
-      />
+        <div className="title-opts">
+          {titles.map((t, i) => (
+            <div
+              key={i}
+              className={`title-opt ${t === title ? "chosen" : ""}`}
+              onClick={() => pickTitle(t)}
+            >
+              <div className="check" />
+              <span>{t}</span>
+            </div>
+          ))}
+        </div>
 
-      <Label htmlFor={`accent-${screenshot.id}`} style={{ marginTop: "0.5rem" }}>Accent word</Label>
-      <Input
-        id={`accent-${screenshot.id}`}
-        value={accent}
-        onChange={(e) => setAccent(e.target.value)}
-        onBlur={() => save(title, accent)}
-      />
-    </li>
+        <div style={{ marginTop: 14 }}>
+          <label className="label" htmlFor={`title-${screenshot.id}`} style={{ display: "block", marginBottom: 6 }}>
+            Or write your own
+          </label>
+          <textarea
+            id={`title-${screenshot.id}`}
+            className="textarea"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onBlur={() => save(title, accent)}
+            rows={2}
+          />
+          <label className="label" htmlFor={`accent-${screenshot.id}`} style={{ display: "block", margin: "10px 0 6px" }}>
+            Accent phrase
+          </label>
+          <input
+            id={`accent-${screenshot.id}`}
+            className="input"
+            value={accent}
+            onChange={(e) => setAccent(e.target.value)}
+            onBlur={() => save(title, accent)}
+          />
+        </div>
+      </div>
+    </div>
   );
 }

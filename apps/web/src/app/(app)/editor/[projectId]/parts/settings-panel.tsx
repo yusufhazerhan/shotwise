@@ -1,8 +1,20 @@
 "use client";
 import * as React from "react";
-import { Input, Label, Textarea, Tabs, TabsList, TabsTrigger, TabsContent, Select, SelectTrigger, SelectContent, SelectItem, SelectValue, RadioGroup, RadioItem, Checkbox } from "@shotwise/ui-primitives";
 import { LOCALES, type Locale } from "@shotwise/types";
 import type { Project, Screenshot } from "@shotwise/db";
+
+const FONTS = ["Inter", "Fraunces", "Space Grotesk", "JetBrains Mono"];
+const PRESETS = [
+  { value: "iphone67", label: '6.7" iPhone · 1284×2778' },
+  { value: "iphone65", label: '6.5" iPhone · 1242×2688' },
+  { value: "ipad129",  label: "iPad Pro · 2048×2732" },
+  { value: "android",  label: "Android · 1080×1920" },
+];
+const THEMES = [
+  { value: "cream",   label: "Cream" },
+  { value: "dark",    label: "Dark" },
+  { value: "premium", label: "Premium" },
+];
 
 export function SettingsPanel({
   project,
@@ -22,6 +34,7 @@ export function SettingsPanel({
   const localized = (screenshot.localized ?? {}) as Record<string, { title?: string; accent?: string }>;
   const en = localized.en ?? { title: "", accent: "" };
 
+  const [activeTab, setActiveTab] = React.useState<"screen" | "canvas">("screen");
   const [title, setTitle] = React.useState(en.title ?? "");
   const [accent, setAccent] = React.useState(en.accent ?? "");
   const debounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -35,18 +48,12 @@ export function SettingsPanel({
 
   React.useEffect(() => {
     patchDebounced({
-      localized: {
-        ...localized,
-        en: { title, accent: accent || undefined },
-      },
+      localized: { ...localized, en: { title, accent: accent || undefined } },
     });
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, accent]);
 
-  // Project-level changes saved via dedicated endpoint
   async function patchProject(patch: Record<string, unknown>) {
     await fetch(`/api/projects/${project.id}`, {
       method: "PATCH",
@@ -55,90 +62,112 @@ export function SettingsPanel({
     });
   }
 
+  const languages = config.languages ?? ["en"];
+  const position = config.defaultPosition ?? "top";
+
+  function toggleLang(l: Locale, enabled: boolean) {
+    const next = new Set<Locale>(languages as Locale[]);
+    if (enabled) next.add(l); else next.delete(l);
+    if (next.size === 0) next.add("en");
+    void patchProject({ config: { ...config, languages: Array.from(next) } });
+  }
+
   return (
-    <div data-slot="settings-panel">
-      <Tabs defaultValue="screen">
-        <TabsList>
-          <TabsTrigger value="screen">Screen</TabsTrigger>
-          <TabsTrigger value="canvas">Canvas</TabsTrigger>
-        </TabsList>
+    <div data-slot="settings-panel" style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
+      <div className="tab-row">
+        <button className={`tab ${activeTab === "screen" ? "on" : ""}`} onClick={() => setActiveTab("screen")}>Screen</button>
+        <button className={`tab ${activeTab === "canvas" ? "on" : ""}`} onClick={() => setActiveTab("canvas")}>Canvas</button>
+      </div>
 
-        <TabsContent value="screen">
-          <Label htmlFor="title">Title</Label>
-          <Textarea id="title" value={title} onChange={(e) => setTitle(e.target.value)} rows={3} />
-
-          <Label htmlFor="accent" style={{ marginTop: "0.5rem" }}>Accent word</Label>
-          <Input id="accent" value={accent} onChange={(e) => setAccent(e.target.value)} />
-        </TabsContent>
-
-        <TabsContent value="canvas">
-          <Label>Theme</Label>
-          <Select
-            defaultValue={config.themeId ?? "cream"}
-            onValueChange={(v) => void patchProject({ config: { ...config, themeId: v } })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="cream">Cream</SelectItem>
-              <SelectItem value="dark">Dark</SelectItem>
-              <SelectItem value="premium">Premium</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Label style={{ marginTop: "0.5rem" }}>Canvas preset</Label>
-          <Select
-            defaultValue={config.canvasPresetId ?? "iphone67"}
-            onValueChange={(v) => void patchProject({ config: { ...config, canvasPresetId: v } })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="iphone67">iPhone 6.7&quot;</SelectItem>
-              <SelectItem value="iphone65">iPhone 6.5&quot;</SelectItem>
-              <SelectItem value="ipad129">iPad 12.9&quot;</SelectItem>
-              <SelectItem value="android">Android phone</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Label style={{ marginTop: "0.5rem" }}>Title position</Label>
-          <RadioGroup
-            defaultValue={config.defaultPosition ?? "top"}
-            onValueChange={(v) => void patchProject({ config: { ...config, defaultPosition: v } })}
-            style={{ display: "flex", gap: "1rem" }}
-          >
-            <label style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
-              <RadioItem value="top" /> Top
-            </label>
-            <label style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
-              <RadioItem value="bottom" /> Bottom
-            </label>
-          </RadioGroup>
-
-          <Label style={{ marginTop: "0.5rem" }}>Languages</Label>
-          <div data-slot="lang-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.4rem" }}>
-            {LOCALES.map((l) => {
-              const enabled = (config.languages ?? ["en"]).includes(l);
-              return (
-                <label key={l} style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
-                  <Checkbox
-                    checked={enabled}
-                    onCheckedChange={(checked) => {
-                      const langs = new Set<Locale>(config.languages ?? ["en"]);
-                      if (checked) langs.add(l);
-                      else langs.delete(l);
-                      void patchProject({ config: { ...config, languages: Array.from(langs) } });
-                    }}
-                  />
-                  {l.toUpperCase()}
-                </label>
-              );
-            })}
+      {activeTab === "screen" && (
+        <div className="settings">
+          <div className="group">
+            <h6>Copy</h6>
+            <div className="field">
+              <label className="label" htmlFor="s-title">Title</label>
+              <textarea
+                id="s-title"
+                className="textarea"
+                rows={3}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+            <div className="field">
+              <label className="label" htmlFor="s-accent">Accent phrase</label>
+              <input
+                id="s-accent"
+                className="input"
+                value={accent}
+                onChange={(e) => setAccent(e.target.value)}
+              />
+              <div className="help">This phrase will be highlighted in the title.</div>
+            </div>
+            <div className="field">
+              <label className="label">Position</label>
+              <div className="radio-group">
+                <button className={position === "top" ? "on" : ""} onClick={() => void patchProject({ config: { ...config, defaultPosition: "top" } })}>Top</button>
+                <button className={position === "bottom" ? "on" : ""} onClick={() => void patchProject({ config: { ...config, defaultPosition: "bottom" } })}>Bottom</button>
+              </div>
+            </div>
           </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
+
+      {activeTab === "canvas" && (
+        <div className="settings">
+          <div className="group">
+            <h6>Output</h6>
+            <div className="field">
+              <label className="label" htmlFor="c-preset">Size preset</label>
+              <select
+                id="c-preset"
+                className="select"
+                value={config.canvasPresetId ?? "iphone67"}
+                onChange={(e) => void patchProject({ config: { ...config, canvasPresetId: e.target.value } })}
+              >
+                {PRESETS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="group">
+            <h6>Theme</h6>
+            <div className="field">
+              <label className="label" htmlFor="c-theme">Style</label>
+              <select
+                id="c-theme"
+                className="select"
+                value={config.themeId ?? "cream"}
+                onChange={(e) => void patchProject({ config: { ...config, themeId: e.target.value } })}
+              >
+                {THEMES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="group">
+            <h6>Languages</h6>
+            <div className="field">
+              <div className="lang-grid">
+                {LOCALES.map((l) => {
+                  const enabled = (languages as Locale[]).includes(l);
+                  return (
+                    <label key={l} className={`lang-item ${enabled ? "on" : ""}`}>
+                      <input
+                        type="checkbox"
+                        checked={enabled}
+                        onChange={(e) => toggleLang(l, e.target.checked)}
+                      />
+                      {l.toUpperCase()}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

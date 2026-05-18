@@ -2,7 +2,6 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button, Input, Label, Textarea, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@shotwise/ui-primitives";
 import type { Project } from "@shotwise/db";
 
 const Schema = z.object({
@@ -14,6 +13,8 @@ const Schema = z.object({
 });
 
 type FormValues = z.infer<typeof Schema>;
+
+const CATEGORIES = ["productivity", "health", "lifestyle", "education", "pet", "finance", "social", "utilities", "other"] as const;
 
 export function Step1AppInfo({ project, onContinue }: { project: Project; onContinue: () => Promise<void> | void }) {
   const meta = (project.appMetadata ?? {}) as Partial<FormValues>;
@@ -41,34 +42,47 @@ export function Step1AppInfo({ project, onContinue }: { project: Project; onCont
 
   return (
     <form data-slot="wizard-step-1" onSubmit={handleSubmit(onSubmit)}>
-      <h1 style={{ margin: 0, fontSize: "1.5rem" }}>Tell us about your app</h1>
-      <p style={{ color: "var(--muted-fg)" }}>We pass this to the AI when generating titles.</p>
+      <span className="step-eyebrow">// Step 1 — About your app</span>
+      <h1 className="step-h">Tell us about your app.</h1>
+      <p className="step-sub">Three short fields plus a few features. The AI uses them to write titles that match your tone.</p>
 
-      <Label htmlFor="appName" style={{ marginTop: "1rem" }}>App name *</Label>
-      <Input id="appName" {...register("appName", { required: true })} />
+      <div className="step-body">
+        <div className="field">
+          <label className="label" htmlFor="s1-name">App name <span style={{ color: "#B91C1C" }}>*</span></label>
+          <input id="s1-name" className="input" {...register("appName", { required: true })} />
+        </div>
 
-      <Label htmlFor="category" style={{ marginTop: "0.75rem" }}>Category</Label>
-      <Select value={category} onValueChange={(v) => setValue("category", v as FormValues["category"])}>
-        <SelectTrigger><SelectValue /></SelectTrigger>
-        <SelectContent>
-          {(["productivity", "health", "lifestyle", "education", "pet", "finance", "social", "utilities", "other"] as const).map((c) => (
-            <SelectItem key={c} value={c}>{c}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        <div className="field">
+          <label className="label" htmlFor="s1-cat">Category</label>
+          <select
+            id="s1-cat"
+            className="select"
+            value={category}
+            onChange={(e) => setValue("category", e.target.value as FormValues["category"])}
+          >
+            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
 
-      <Label htmlFor="tagline" style={{ marginTop: "0.75rem" }}>Tagline</Label>
-      <Input id="tagline" maxLength={100} {...register("tagline")} />
+        <div className="field">
+          <label className="label" htmlFor="s1-tag">Tagline</label>
+          <input id="s1-tag" className="input" maxLength={100} {...register("tagline")} />
+        </div>
 
-      <Label htmlFor="description" style={{ marginTop: "0.75rem" }}>Short description</Label>
-      <Textarea id="description" maxLength={500} rows={3} {...register("description")} />
+        <div className="field">
+          <label className="label" htmlFor="s1-desc">Short description</label>
+          <textarea id="s1-desc" className="textarea" maxLength={500} rows={3} {...register("description")} />
+        </div>
 
-      <Label htmlFor="targetAudience" style={{ marginTop: "0.75rem" }}>Target audience</Label>
-      <Input id="targetAudience" maxLength={80} placeholder="e.g. solo founders, pet parents" {...register("targetAudience")} />
+        <div className="field">
+          <label className="label" htmlFor="s1-aud">Target audience</label>
+          <input id="s1-aud" className="input" maxLength={80} placeholder="e.g. solo founders, pet parents" {...register("targetAudience")} />
+        </div>
 
-      <Button type="submit" variant="primary" loading={formState.isSubmitting} style={{ width: "100%", marginTop: "1.25rem" }}>
-        Continue →
-      </Button>
+        <button type="submit" className="btn btn-primary" style={{ marginTop: 8 }} disabled={formState.isSubmitting}>
+          {formState.isSubmitting ? "Saving…" : "Continue →"}
+        </button>
+      </div>
     </form>
   );
 }

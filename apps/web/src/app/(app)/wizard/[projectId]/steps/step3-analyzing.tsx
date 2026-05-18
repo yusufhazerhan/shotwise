@@ -1,6 +1,5 @@
 "use client";
 import * as React from "react";
-import { Button, ProgressBar, Spinner } from "@shotwise/ui-primitives";
 import type { Project, Screenshot } from "@shotwise/db";
 
 export function Step3Analyzing({
@@ -25,19 +24,17 @@ export function Step3Analyzing({
       try {
         for (let i = 0; i < screenshots.length; i++) {
           const ss = screenshots[i]!;
-          if (ss.aiAnalysis) {
-            setIndex(i + 1);
-            continue;
-          }
-          const r = await fetch("/api/ai/analyze", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ screenshotId: ss.id }),
-          });
-          if (!r.ok) {
-            const j = await r.json().catch(() => ({}));
-            setError(j?.error?.message ?? `HTTP ${r.status}`);
-            return;
+          if (!ss.aiAnalysis) {
+            const r = await fetch("/api/ai/analyze", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ screenshotId: ss.id }),
+            });
+            if (!r.ok) {
+              const j = await r.json().catch(() => ({})) as { error?: { message?: string } };
+              setError(j?.error?.message ?? `HTTP ${r.status}`);
+              return;
+            }
           }
           setIndex(i + 1);
         }
@@ -51,21 +48,47 @@ export function Step3Analyzing({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const pct = Math.round((index / Math.max(screenshots.length, 1)) * 100);
+
   return (
-    <div data-slot="wizard-step-3" style={{ textAlign: "center" }}>
-      <h1 style={{ margin: 0, fontSize: "1.5rem" }}>AI is analyzing your screens</h1>
-      <p style={{ color: "var(--muted-fg)" }}>Reading each screenshot and generating titles…</p>
-      <div style={{ margin: "1.5rem 0" }}>
-        <Spinner />
+    <div data-slot="wizard-step-3">
+      <span className="step-eyebrow">// Step 3 — Analyzing</span>
+      <h1 className="step-h">Reading your screenshots…</h1>
+      <p className="step-sub">The AI is identifying UI elements and generating title suggestions.</p>
+
+      <div className="analyze-list">
+        {screenshots.map((s, i) => {
+          const done = i < index;
+          const active = i === index;
+          return (
+            <div key={s.id} className="analyze-card">
+              <div className="analyze-thumb" />
+              <div className="analyze-info">
+                <div className="nm">Screen {i + 1}</div>
+                <div className="st">
+                  {done ? "✓ Done" : active ? "Analyzing…" : "Waiting"}
+                </div>
+                {active && (
+                  <div className="analyze-progress">
+                    <div style={{ width: "60%" }} />
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
-      <ProgressBar value={(index / Math.max(screenshots.length, 1)) * 100} />
-      <p style={{ marginTop: "0.6rem", color: "var(--muted-fg)" }}>{index} / {screenshots.length} analyzed</p>
+
       {error && (
-        <div data-slot="wizard-step-3-error" style={{ color: "#dc2626", marginTop: "1rem" }}>
-          <p>{error}</p>
-          <Button variant="secondary" onClick={onBack}>← Back</Button>
+        <div style={{ marginTop: "1.5rem" }}>
+          <p style={{ color: "#B91C1C" }}>{error}</p>
+          <button className="btn btn-ghost" onClick={onBack}>← Back</button>
         </div>
       )}
+
+      <p style={{ marginTop: "1.5rem", fontSize: 13, color: "var(--ink-mute)", fontFamily: "var(--font-mono)" }}>
+        {index} / {screenshots.length} analyzed · {pct}%
+      </p>
     </div>
   );
 }
