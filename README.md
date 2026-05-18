@@ -1,9 +1,12 @@
 # Shotwise
 
 > **AI-powered App Store screenshot generator.**
-> Yükle. Anlat. AI başlığı yazsın, görseli üretsin. Bütün dillerde.
+> Upload. Describe. AI writes the titles, ships the PNGs. In every language.
 
-Mobil uygulama geliştiricileri için **App Store / Play Store marketing screenshot** üretme aracı. Bir mobil uygulamanın raw ekran görüntülerini alır, üzerine başlık + accent + arka plan ekler, App Store formatına (1284×2778) export eder. **Gemini AI** ile uygulama açıklamasından otomatik başlık üretir, istenen tüm dillere çevirir.
+Marketing-screenshot SaaS for App Store / Play Store. Take raw app screens,
+overlay a punchy title + accent + background, export at native store
+resolutions. **Gemini Vision** proposes launch-ready titles; **Gemini Flash**
+translates them across 9 locales.
 
 ```
 Raw screenshot  →  Title + style + AI  →  Store-ready PNG
@@ -11,100 +14,122 @@ Raw screenshot  →  Title + style + AI  →  Store-ready PNG
 
 ---
 
-## Neden var?
-
-Solo founder/küçük ekiplerin app store launch'unda en büyük 2 ağrı:
-1. **Screenshot tasarımı** — Figma'da saatler, her yeni dil için yeniden iş
-2. **Marketing copy** — başlık yazmak zor, lokalize etmek daha zor
-
-Shotwise ikisini bir adımda halleder: yükle, app'ini anlat, AI başlık + görsel üretsin.
-
-## İki mod
-
-### 🎯 Wizard Mode (önerilen)
-1. App'ini anlat: ad, kategori, hedef kitle, anahtar özellikler
-2. Screenshot'ları yükle
-3. AI her ekranı analiz eder (Gemini Vision), başlık önerir
-4. Stil seç: cream, dark, colorful, premium
-5. Dil seç: EN, TR, ES, FR, DE, PT, IT, JA, KO (Gemini çevirir)
-6. AI tüm görselleri üretir → ZIP indir
-
-### 🎨 Manual Mode
-- Her ekran için title, accent kelime, font, renk, arkaplan tek tek ayarla
-- Live preview
-- Tam kontrol — designer için
-
-## Teknik
-
-- **Backend:** Node.js + Sharp + SVG-based image generation (no Figma, no Photoshop, native)
-- **Frontend:** Next.js + Tailwind + shadcn/ui
-- **AI:** Google Gemini API (text + vision)
-- **DB:** Postgres (Neon)
-- **Auth:** Clerk
-- **Storage:** Cloudflare R2 (S3-compatible, ucuz)
-- **Payment:** Stripe veya LemonSqueezy
-- **Hosting:** Vercel (frontend) + Fly.io (image worker)
-
-Detay için → [`docs/TECH.md`](docs/TECH.md)
-
-## Roadmap özeti
-
-- **Faz 1 (MVP, 4 hafta):** CLI tool + 1 stil + EN/TR. Kendi kullanım.
-- **Faz 2 (Web, 6 hafta):** Next.js dashboard, manuel mod, single user.
-- **Faz 3 (SaaS, 4 hafta):** Wizard + AI + auth + payment. İlk müşteri.
-- **Faz 4 (Scale):** Çoklu stil, template marketplace, brand kit.
-
-Detay → [`docs/ROADMAP.md`](docs/ROADMAP.md)
-
-## Hedef pazar
-
-| Müşteri | Acı | Petwises sözü |
-|---|---|---|
-| Solo iOS/Android developer | Figma'da saatler | 5 dakikada 10 görsel |
-| Indie founder (no design) | Tasarım yapamıyor | AI tasarlar |
-| Multi-locale app | Her dil için yeni iş | Tek tıkla 9 dil |
-| Agency / freelancer | Toplu screenshot işi | Bulk export, brand kit |
-
-## İş modeli (planlanan)
-
-- **Free:** 3 export/ay, watermark
-- **Pro:** $19/ay, sınırsız, AI dahil
-- **Team:** $49/ay, brand kit, multi-user
-
-## Klasör yapısı
+## What's in this repo
 
 ```
 shotwise/
-├── README.md                   ← buradasın
-├── docs/
-│   ├── VISION.md               # uzun vadeli yön, neden bu
-│   ├── FEATURES.md             # tüm planlı özellikler detay
-│   ├── TECH.md                 # tech stack kararları
-│   ├── ROADMAP.md              # faz faz plan
-│   └── CLAUDE_DESIGN_PROMPT.md # Claude Design'a web UI tasarlatmak için prompt
-└── packages/
-    └── core/                   # SVG + Sharp image generator (kullanılabilir CLI)
-        ├── src/
-        ├── examples/
-        └── package.json
+├── apps/
+│   └── web/             # Next.js 15 app — marketing, auth, dashboard, editor, wizard, credits
+├── packages/
+│   ├── core/            # Sharp + SVG render engine (themes, presets, batch)
+│   ├── types/           # Shared TS types
+│   ├── db/              # Drizzle schema + queries (Postgres)
+│   ├── auth/            # Better-Auth wrapper (magic-link via Resend, optional Google)
+│   ├── ai/              # Gemini client + prompts (analyze, generate, translate)
+│   ├── storage/         # S3-compatible client (MinIO local, any S3 in prod)
+│   ├── billing/         # Paddle checkout + webhook helpers
+│   ├── credits/         # Credit ledger domain logic
+│   └── ui-primitives/   # Unstyled Radix-based primitives with data-slot hooks
+├── infra/
+│   ├── docker-compose.dev.yml   # Postgres + MinIO for local dev
+│   ├── docker-compose.prod.yml  # full stack (app + postgres + minio + caddy)
+│   ├── Caddyfile / postgres / minio / backup / cron / deploy   # ops bits
+└── docs/
+    ├── DEPLOYMENT.md            # VPS setup A→Z
+    ├── DESIGN_HANDOFF.md        # how to skin the app
+    └── VISION / FEATURES / TECH / ROADMAP   # original product docs
 ```
 
-## Hızlı başlangıç (Faz 1 CLI)
+---
+
+## Stack
+
+- **App**: Next.js 15 (App Router) + React 18 + Tailwind CSS
+- **Auth**: [Better-Auth](https://www.better-auth.com) (magic-link via Resend)
+- **DB**: Postgres + Drizzle ORM
+- **Storage**: S3-compatible (MinIO in dev/self-hosted, Cloudflare R2 / AWS S3 in prod)
+- **AI**: Google Gemini 1.5 Flash (Vision + Text JSON)
+- **Payment**: [Paddle](https://www.paddle.com) (Merchant of Record, EU VAT handled)
+- **Render**: Sharp + SVG, native Node, no headless browser
+- **Deploy**: Single VPS + Docker Compose + Caddy auto-TLS
+
+---
+
+## Business model
+
+**Credit-based, not a subscription.**
+
+- **Free trial**: 5 credits on signup
+- **Starter pack**: $4.99 → 100 credits + 20 free credits every month going forward
+- **Top-up**: $2.99 → 50 credits anytime
+
+1 credit = 1 source screen, rendered in every language the user selected.
+
+---
+
+## Local development
 
 ```bash
-cd packages/core
+# 0. Install
 pnpm install
-pnpm tsx examples/cli.ts \
-  --input ../../petwise/marketing/screenshots/raw/en/home.png \
-  --output ./out/home.png \
-  --title "Smarter training, 5 minutes a day" \
-  --accent "5 minutes"
+
+# 1. Start local Postgres + MinIO
+pnpm docker:dev
+
+# 2. Environment
+cp .env.example .env.local
+# Fill in BETTER_AUTH_SECRET (random), GEMINI_API_KEY (free tier), PADDLE_* (sandbox).
+# RESEND_API_KEY can be left blank — magic links print to the dev console.
+
+# 3. Schema
+pnpm db:push
+
+# 4. Run
+pnpm dev
+# → http://localhost:3000
 ```
 
-## Lisans
+### Useful pages
 
-MIT (Faz 1-3). Faz 4'te commercial SaaS → kapalı kaynak.
+- `/` — marketing landing
+- `/sign-up` → magic-link → `/dashboard`
+- `/wizard/new` — full AI-driven flow
+- `/editor/new` — manual mode
+- `/credits` — Paddle checkout + ledger
+- `/_dev/preview` — design hand-off reference (every UI primitive + every `data-slot`)
 
-## Bağlantılı projeler
+---
 
-- [Petwises](../petwise) — Shotwise'ın ilk müşterisi (kendi ürünümüzü besler).
+## Production
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the full VPS playbook.
+
+The short version: provision a Hetzner CX22 (or similar), point your domain
+to it, fill in `.env`, then:
+
+```bash
+git clone <repo> /opt/shotwise && cd /opt/shotwise/infra
+docker compose -f docker-compose.prod.yml --env-file ../.env up -d
+```
+
+Caddy issues TLS automatically. Push to `main` triggers GitHub Actions →
+GHCR image build → SSH deploy.
+
+---
+
+## Design hand-off
+
+Everything in `apps/web` is intentionally **un-styled or minimally styled**.
+All structural containers carry `data-slot="..."` attributes so a design
+package (Claude Design output) can override visual presentation without
+touching markup, state, or routing.
+
+See [docs/DESIGN_HANDOFF.md](docs/DESIGN_HANDOFF.md) for the full slot
+inventory and CSS-variable contract.
+
+---
+
+## License
+
+MIT for the infrastructure and `packages/core`. App-layer code is reserved
+for commercial use once launched.

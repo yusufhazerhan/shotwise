@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "incremental": true,
+    "paths": {
+      "@shotwise/core": ["./packages/core/src/index.ts"],
+      "@shotwise/core/*": ["./packages/core/src/*"],
+      "@shotwise/types": ["./packages/types/src/index.ts"],
+      "@shotwise/db": ["./packages/db/src/index.ts"],
+      "@shotwise/db/*": ["./packages/db/src/*"],
+      "@shotwise/auth": ["./packages/auth/src/index.ts"],
+      "@shotwise/auth/*": ["./packages/auth/src/*"],
+      "@shotwise/ai": ["./packages/ai/src/index.ts"],
+      "@shotwise/storage": ["./packages/storage/src/index.ts"],
+      "@shotwise/billing": ["./packages/billing/src/index.ts"],
+      "@shotwise/credits": ["./packages/credits/src/index.ts"],
+      "@shotwise/ui-primitives": ["./packages/ui-primitives/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "dist", ".next", "build"]
+}

@@ -1,0 +1,61 @@
+name: shotwise-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: shotwise-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: shotwise
+      POSTGRES_PASSWORD: shotwise
+      POSTGRES_DB: shotwise
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shotwise -d shotwise"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    container_name: shotwise-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Bucket bootstrap (runs once, creates buckets, sets lifecycle on exports)
+  minio-init:
+    image: minio/mc:latest
+    container_name: shotwise-minio-init
+    depends_on:
+      minio:
+        condition: service_started
+    entrypoint: >
+      /bin/sh -c "
+      sleep 3 &&
+      mc alias set local http://minio:9000 minioadmin minioadmin &&
+      mc mb -p local/shotwise-raw || true &&
+      mc mb -p local/shotwise-exports || true &&
+      mc anonymous set none local/shotwise-raw &&
+      mc anonymous set none local/shotwise-exports &&
+      echo 'MinIO buckets ready: shotwise-raw, shotwise-exports'
+      "
+
+volumes:
+  postgres_data:
+  minio_data:

@@ -136,7 +136,7 @@ export function buildShadow({
 export function buildBackground(width: number, height: number, background: string): Buffer {
   const gradMatch = /linear-gradient\((\d+deg),\s*(.+)\)/i.exec(background);
 
-  if (gradMatch) {
+  if (gradMatch && gradMatch[1] && gradMatch[2]) {
     const angle = Number(gradMatch[1]);
     const stops = parseStops(gradMatch[2]);
     const { x1, y1, x2, y2 } = angleToCoords(angle);

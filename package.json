@@ -8,9 +8,36 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "pnpm -r build",
-    "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r test"
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,yaml,yml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md,yaml,yml}\"",
+    "db:push": "pnpm --filter @shotwise/db db:push",
+    "db:studio": "pnpm --filter @shotwise/db db:studio",
+    "db:generate": "pnpm --filter @shotwise/db db:generate",
+    "docker:dev": "docker compose -f infra/docker-compose.dev.yml up -d",
+    "docker:dev:down": "docker compose -f infra/docker-compose.dev.yml down",
+    "docker:dev:logs": "docker compose -f infra/docker-compose.dev.yml logs -f"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "esbuild": "^0.21.5"
+    },
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "@swc/core",
+      "@biomejs/biome"
+    ]
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {

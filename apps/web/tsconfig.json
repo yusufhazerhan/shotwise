@@ -1,0 +1,71 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@shotwise/core": [
+        "../../packages/core/src/index.ts"
+      ],
+      "@shotwise/core/*": [
+        "../../packages/core/src/*"
+      ],
+      "@shotwise/types": [
+        "../../packages/types/src/index.ts"
+      ],
+      "@shotwise/db": [
+        "../../packages/db/src/index.ts"
+      ],
+      "@shotwise/db/*": [
+        "../../packages/db/src/*"
+      ],
+      "@shotwise/auth": [
+        "../../packages/auth/src/index.ts"
+      ],
+      "@shotwise/auth/server": [
+        "../../packages/auth/src/server.ts"
+      ],
+      "@shotwise/auth/client": [
+        "../../packages/auth/src/client.ts"
+      ],
+      "@shotwise/ai": [
+        "../../packages/ai/src/index.ts"
+      ],
+      "@shotwise/storage": [
+        "../../packages/storage/src/index.ts"
+      ],
+      "@shotwise/billing": [
+        "../../packages/billing/src/index.ts"
+      ],
+      "@shotwise/credits": [
+        "../../packages/credits/src/index.ts"
+      ],
+      "@shotwise/ui-primitives": [
+        "../../packages/ui-primitives/src/index.ts"
+      ]
+    },
+    "allowJs": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/**/*",
+    "next.config.ts",
+    "next.config.mjs",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next"
+  ]
+}

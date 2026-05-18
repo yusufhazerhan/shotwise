@@ -37,3 +37,6 @@ packages/core/examples/.shotwise-cache/
 
 # misc
 *.tsbuildinfo
+coverage
+.eslintcache
+next-env.d.ts

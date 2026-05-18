@@ -1,0 +1,12 @@
+# Shotwise host crontab
+# Copy to root crontab on the VPS: `sudo crontab -e`
+# Set APP_URL and CRON_SECRET in /etc/default/shotwise
+
+# Cleanup expired exports (hourly)
+0 * * * * /usr/bin/env -i bash -c 'set -a; source /etc/default/shotwise; /opt/shotwise/infra/cron/cleanup-expired.sh' >> /var/log/shotwise/cron.log 2>&1
+
+# Monthly credit refill (1st of month, 00:05 UTC)
+5 0 1 * * /usr/bin/env -i bash -c 'set -a; source /etc/default/shotwise; /opt/shotwise/infra/cron/monthly-refill.sh' >> /var/log/shotwise/cron.log 2>&1
+
+# Daily DB backup (03:00 UTC)
+0 3 * * * /usr/bin/env -i bash -c 'set -a; source /etc/default/shotwise; /opt/shotwise/infra/backup/pg-backup.sh' >> /var/log/shotwise/backup.log 2>&1

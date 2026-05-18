@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * CSS variables placeholder. Claude Design replaces these values verbatim
+ * (see docs/DESIGN_HANDOFF.md). The structural CSS using these vars stays
+ * the same so swapping a theme is one-file.
+ */
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #f5f5f5;
+  --muted-fg: #666666;
+  --border: #e5e5e5;
+  --accent: #ff5a1f;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --bg: #0b0b0c;
+    --fg: #f7f7f7;
+    --muted: #1a1a1c;
+    --muted-fg: #999999;
+    --border: #2a2a2c;
+  }
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+}
+
+/* Naked primitive baselines (sw-* classes from ui-primitives).
+   Claude Design will OVERRIDE these by adding higher-specificity styles. */
+.sw-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+  font: inherit;
+}
+.sw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.sw-btn--primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.sw-btn--secondary { background: var(--muted); }
+.sw-btn--ghost { border-color: transparent; background: transparent; }
+.sw-btn--danger { background: #dc2626; color: #fff; border-color: #dc2626; }
+.sw-btn--sm { padding: 0.35rem 0.7rem; font-size: 0.85rem; }
+.sw-btn--lg { padding: 0.75rem 1.4rem; font-size: 1.05rem; }
+
+.sw-input, .sw-textarea, .sw-select-trigger {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+}
+.sw-textarea { min-height: 4rem; }
+.sw-label { display: block; margin-bottom: 0.35rem; font-size: 0.85rem; color: var(--muted-fg); }
+
+.sw-card {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--bg);
+}
+.sw-card-header { padding: 1rem 1rem 0; }
+.sw-card-title { font-size: 1rem; font-weight: 600; margin: 0; }
+.sw-card-body { padding: 1rem; }
+.sw-card-footer { padding: 0 1rem 1rem; }
+
+.sw-dialog-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 50;
+}
+.sw-dialog-content {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: var(--bg); border-radius: 0.75rem; padding: 1.25rem;
+  width: min(480px, calc(100vw - 2rem));
+  z-index: 51;
+  border: 1px solid var(--border);
+}
+.sw-dialog-title { font-weight: 600; margin: 0 0 0.5rem; }
+
+.sw-tabs-list { display: inline-flex; gap: 0.25rem; padding: 0.25rem; background: var(--muted); border-radius: 0.5rem; }
+.sw-tabs-trigger { padding: 0.35rem 0.75rem; border-radius: 0.4rem; background: transparent; border: 0; cursor: pointer; }
+.sw-tabs-trigger[data-state="active"] { background: var(--bg); }
+.sw-tabs-content { padding-top: 0.75rem; }
+
+.sw-radio-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.sw-radio-item, .sw-checkbox {
+  width: 1.1rem; height: 1.1rem; border-radius: 0.3rem; border: 1px solid var(--border);
+  background: var(--bg); display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.sw-radio-item { border-radius: 999px; }
+.sw-radio-indicator, .sw-checkbox-indicator { font-size: 0.75rem; line-height: 1; }
+
+.sw-select-trigger { display: inline-flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.sw-select-content { background: var(--bg); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.25rem; box-shadow: 0 6px 24px rgba(0,0,0,0.08); z-index: 50; }
+.sw-select-item { padding: 0.35rem 0.6rem; border-radius: 0.35rem; cursor: pointer; }
+.sw-select-item[data-state="checked"], .sw-select-item:hover { background: var(--muted); }
+
+.sw-slider { position: relative; display: flex; align-items: center; user-select: none; height: 1.25rem; }
+.sw-slider-track { position: relative; flex: 1; height: 0.25rem; background: var(--muted); border-radius: 999px; }
+.sw-slider-range { position: absolute; height: 100%; background: var(--fg); border-radius: 999px; }
+.sw-slider-thumb { display: block; width: 1rem; height: 1rem; background: var(--fg); border-radius: 999px; cursor: pointer; }
+
+.sw-progress { position: relative; height: 0.4rem; background: var(--muted); border-radius: 999px; overflow: hidden; }
+.sw-progress-indicator { display: block; width: 100%; height: 100%; background: var(--fg); transition: transform 0.2s ease; }
+
+.sw-dropzone {
+  border: 2px dashed var(--border); border-radius: 0.75rem; padding: 2.5rem 1rem; text-align: center;
+  cursor: pointer; background: var(--muted);
+}
+.sw-dropzone--active { background: var(--bg); border-color: var(--accent); }
+.sw-dropzone[data-compact] { padding: 0.75rem; }
+
+.sw-toast-viewport { position: fixed; top: 1rem; right: 1rem; display: flex; flex-direction: column; gap: 0.5rem; z-index: 100; }
+.sw-toast { background: var(--bg); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.6rem 0.9rem; box-shadow: 0 6px 24px rgba(0,0,0,0.08); min-width: 240px; }
+.sw-toast--error { border-color: #dc2626; }
+.sw-toast--success { border-color: #16a34a; }
+.sw-toast-title { font-weight: 600; font-size: 0.9rem; }
+.sw-toast-description { font-size: 0.85rem; color: var(--muted-fg); }
+
+.sw-spinner { display: inline-block; animation: sw-spin 0.8s linear infinite; }
+@keyframes sw-spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
