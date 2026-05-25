@@ -13,6 +13,7 @@
     "smoke": "node ./scripts/smoke.mjs"
   },
   "dependencies": {
+    "@aws-sdk/lib-storage": "^3.1048.0",
     "@shotwise/auth": "workspace:*",
     "@shotwise/core": "workspace:*",
     "@shotwise/credits": "workspace:*",
@@ -27,8 +28,8 @@
     "next": "^15.0.3",
     "pino": "^9.5.0",
     "pino-pretty": "^11.3.0",
-    "posthog-js": "^1.176.0",
     "postgres": "^3.4.5",
+    "posthog-js": "^1.176.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.2",
@@ -37,9 +38,9 @@
     "zustand": "^5.0.1"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0-beta.4",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
-    "@tailwindcss/postcss": "^4.0.0-beta.4",
     "@types/archiver": "^6.0.3",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.9.0",
