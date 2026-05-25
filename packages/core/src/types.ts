@@ -68,6 +68,107 @@ export interface RenderOptions {
   screenshot: ScreenshotOptions;
 }
 
+export type SceneBackground =
+  | { type: "solid"; color: string }
+  | { type: "linear"; from: string; to: string; angle: number; midpoint?: number };
+
+export type SceneLayoutPreset = "single" | "sideBySide" | "stacked" | "card" | "beforeAfter" | "callout";
+export type SceneDeviceKind = "none" | "iphone" | "ipad" | "android";
+export type SceneFrameStyle = "none" | "minimal" | "bezel" | "glass";
+export type SceneTextRole = "title" | "subtitle" | "badge" | "note";
+
+export interface SceneTextBlock {
+  id: string;
+  role: SceneTextRole;
+  text: string;
+  accent?: string;
+  x: number;
+  y: number;
+  width: number;
+  align: "left" | "center" | "right";
+  fontFamily: string;
+  fontSize: number;
+  fontWeight: number;
+  lineHeight: number;
+  /** Relative extra gap between letters. Useful when heavy fonts visually merge. */
+  letterSpacing?: number;
+  /** Relative extra gap between words. Useful for bold store headlines. */
+  wordSpacing?: number;
+  color: string;
+  accentColor: string;
+}
+
+export interface SceneScreenshotTransform {
+  x: number;
+  y: number;
+  width: number;
+  scale: number;
+  rotation: number;
+  fit: "contain" | "cover";
+}
+
+export interface SceneScreenshotSlot extends SceneScreenshotTransform {
+  id: string;
+  /** The uploaded/local screenshot id that should fill this slot. */
+  sourceId?: string;
+  /** Optional per-slot device overrides. Falls back to the scene-level device. */
+  device?: Partial<SceneDeviceOptions>;
+  /** Optional editor-facing label for templates such as Before / After. */
+  label?: string;
+}
+
+export interface SceneDeviceOptions {
+  enabled: boolean;
+  kind: SceneDeviceKind;
+  frameStyle: SceneFrameStyle;
+  padding: number;
+  radius: number;
+  shadow: ShadowIntensity;
+  tilt: number;
+  hideStatusBar: boolean;
+}
+
+export interface SceneCallout {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  label: string;
+  color: string;
+}
+
+export interface SceneAdvancedOverrides {
+  customCss?: string;
+  customJson?: Record<string, unknown>;
+}
+
+export interface StoreScreenshotScene {
+  version: 1;
+  canvasPresetId: string;
+  background: SceneBackground;
+  layoutPreset: SceneLayoutPreset;
+  /**
+   * Backwards-compatible primary screenshot transform. New templates should use
+   * `screenshots`; this remains the migration source and single-screen alias.
+   */
+  device: SceneDeviceOptions;
+  screenshot: SceneScreenshotTransform;
+  screenshots?: SceneScreenshotSlot[];
+  textBlocks: SceneTextBlock[];
+  callouts: SceneCallout[];
+  advanced?: SceneAdvancedOverrides;
+}
+
+export interface SceneRenderOptions {
+  source: string | Buffer;
+  /** Optional source lookup for multi-slot scenes. Falls back to `source`. */
+  sources?: Record<string, string | Buffer>;
+  scene: StoreScreenshotScene;
+  canvas: { width: number; height: number };
+  localeText?: { title?: string; subtitle?: string; accent?: string };
+}
+
 export interface Theme {
   id: string;
   label: string;

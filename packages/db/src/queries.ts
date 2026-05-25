@@ -13,20 +13,25 @@ import {
   screenshots,
   users,
   webhooksLog,
+  type CreditLedgerRow,
+  type ExportJob,
   type NewExportJob,
   type NewProject,
   type NewScreenshot,
   type NewUser,
+  type Project,
+  type Screenshot,
+  type User,
 } from "./schema.js";
 
 // ─── Users ───────────────────────────────────────────────────────────────────
 
-export async function getUserById(db: Database, id: string) {
+export async function getUserById(db: Database, id: string): Promise<User | undefined> {
   const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
   return rows[0];
 }
 
-export async function getUserByEmail(db: Database, email: string) {
+export async function getUserByEmail(db: Database, email: string): Promise<User | undefined> {
   const rows = await db.select().from(users).where(eq(users.email, email)).limit(1);
   return rows[0];
 }
@@ -38,25 +43,44 @@ export async function activateMonthlyRefill(db: Database, userId: string) {
     .where(eq(users.id, userId));
 }
 
-export async function setPaddleCustomerId(db: Database, userId: string, paddleCustomerId: string) {
+export async function setPaymentCustomerId(db: Database, userId: string, paymentCustomerId: string) {
   await db
     .update(users)
-    .set({ paddleCustomerId, updatedAt: new Date() })
+    .set({ paymentCustomerId, updatedAt: new Date() })
     .where(eq(users.id, userId));
 }
 
-export async function listUsersWithActiveRefill(db: Database) {
+export async function setUserSignupIp(db: Database, userId: string, signupIp: string) {
+  await db
+    .update(users)
+    .set({ signupIp, updatedAt: new Date() })
+    .where(eq(users.id, userId));
+}
+
+export async function countUsersBySignupIp(db: Database, signupIp: string): Promise<number> {
+  const result = await db
+    .select({ total: sql<number>`COUNT(*)::int` })
+    .from(users)
+    .where(eq(users.signupIp, signupIp));
+  return result[0]?.total ?? 0;
+}
+
+export async function listUsersWithActiveRefill(db: Database): Promise<User[]> {
   return db.select().from(users).where(eq(users.monthlyRefillActive, true));
 }
 
 // ─── Projects ────────────────────────────────────────────────────────────────
 
-export async function createProject(db: Database, input: NewProject) {
+export async function createProject(db: Database, input: NewProject): Promise<Project> {
   const rows = await db.insert(projects).values(input).returning();
   return rows[0]!;
 }
 
-export async function getProjectById(db: Database, id: string, userId: string) {
+export async function getProjectById(
+  db: Database,
+  id: string,
+  userId: string
+): Promise<Project | undefined> {
   const rows = await db
     .select()
     .from(projects)
@@ -65,7 +89,7 @@ export async function getProjectById(db: Database, id: string, userId: string) {
   return rows[0];
 }
 
-export async function listProjects(db: Database, userId: string) {
+export async function listProjects(db: Database, userId: string): Promise<Project[]> {
   return db
     .select()
     .from(projects)
@@ -78,7 +102,7 @@ export async function updateProject(
   id: string,
   userId: string,
   patch: Partial<Pick<NewProject, "name" | "appMetadata" | "config" | "mode">>
-) {
+): Promise<Project | undefined> {
   const rows = await db
     .update(projects)
     .set({ ...patch, updatedAt: new Date() })
@@ -93,12 +117,12 @@ export async function deleteProject(db: Database, id: string, userId: string) {
 
 // ─── Screenshots ─────────────────────────────────────────────────────────────
 
-export async function createScreenshot(db: Database, input: NewScreenshot) {
+export async function createScreenshot(db: Database, input: NewScreenshot): Promise<Screenshot> {
   const rows = await db.insert(screenshots).values(input).returning();
   return rows[0]!;
 }
 
-export async function listScreenshots(db: Database, projectId: string) {
+export async function listScreenshots(db: Database, projectId: string): Promise<Screenshot[]> {
   return db
     .select()
     .from(screenshots)
@@ -106,7 +130,7 @@ export async function listScreenshots(db: Database, projectId: string) {
     .orderBy(asc(screenshots.order));
 }
 
-export async function getScreenshotById(db: Database, id: string) {
+export async function getScreenshotById(db: Database, id: string): Promise<Screenshot | undefined> {
   const rows = await db.select().from(screenshots).where(eq(screenshots.id, id)).limit(1);
   return rows[0];
 }
@@ -115,7 +139,7 @@ export async function updateScreenshot(
   db: Database,
   id: string,
   patch: Partial<NewScreenshot>
-) {
+): Promise<Screenshot | undefined> {
   const rows = await db
     .update(screenshots)
     .set({ ...patch, updatedAt: new Date() })
@@ -145,12 +169,12 @@ export async function setScreenshotsOrder(
 
 // ─── Export jobs ─────────────────────────────────────────────────────────────
 
-export async function createExportJob(db: Database, input: NewExportJob) {
+export async function createExportJob(db: Database, input: NewExportJob): Promise<ExportJob> {
   const rows = await db.insert(exportJobs).values(input).returning();
   return rows[0]!;
 }
 
-export async function getExportJobById(db: Database, id: string) {
+export async function getExportJobById(db: Database, id: string): Promise<ExportJob | undefined> {
   const rows = await db.select().from(exportJobs).where(eq(exportJobs.id, id)).limit(1);
   return rows[0];
 }
@@ -159,7 +183,7 @@ export async function updateExportJob(
   db: Database,
   id: string,
   patch: Partial<NewExportJob>
-) {
+): Promise<ExportJob | undefined> {
   const rows = await db
     .update(exportJobs)
     .set({ ...patch, updatedAt: new Date() })
@@ -168,7 +192,7 @@ export async function updateExportJob(
   return rows[0];
 }
 
-export async function listExpiredExportJobs(db: Database, now: Date) {
+export async function listExpiredExportJobs(db: Database, now: Date): Promise<ExportJob[]> {
   return db
     .select()
     .from(exportJobs)
@@ -185,7 +209,11 @@ export async function getCreditBalance(db: Database, userId: string): Promise<nu
   return result[0]?.balance ?? 0;
 }
 
-export async function listCreditLedger(db: Database, userId: string, limit = 50) {
+export async function listCreditLedger(
+  db: Database,
+  userId: string,
+  limit = 50
+): Promise<CreditLedgerRow[]> {
   return db
     .select()
     .from(creditLedger)

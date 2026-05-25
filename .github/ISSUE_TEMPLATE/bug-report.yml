@@ -1,0 +1,50 @@
+name: Bug report
+description: Report a reproducible bug in Shotwise
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping us tighten the product. Please include enough detail for someone else to reproduce the issue locally.
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      placeholder: What broke?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to ...
+        2. Upload ...
+        3. Click ...
+        4. See error ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      placeholder: OS, browser, self-hosted or local Docker, branch or commit if known
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or logs
+      description: Paste short logs or attach screenshots if they help.

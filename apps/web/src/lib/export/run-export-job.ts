@@ -13,14 +13,16 @@ import { getDb, queries } from "@shotwise/db";
 import {
   BUCKETS,
   getObject,
+  keyForFeatureGraphic,
   keyForExportPng,
   keyForExportZip,
   putObject,
   getS3,
 } from "@shotwise/storage";
 import { refund } from "@shotwise/credits";
-import { getCanvasPreset, getTheme, renderWithTheme, type CanvasPresetId } from "@shotwise/core";
+import { createDefaultScene, getCanvasPreset, renderScene, type CanvasPresetId, type StoreScreenshotScene } from "@shotwise/core";
 import type { Locale } from "@shotwise/types";
+import { summarizeExportMatrix, type ExportMatrixSelection } from "@/lib/export-matrix";
 
 export async function runExportJob(jobId: string) {
   const db = getDb();
@@ -46,13 +48,13 @@ export async function runExportJob(jobId: string) {
     themeId?: string;
     canvasPresetId?: CanvasPresetId;
   };
-  const themeId = config.themeId ?? "cream";
   const canvasPresetId = (config.canvasPresetId as CanvasPresetId) ?? "iphone67";
-  const theme = getTheme(themeId);
-  const canvas = getCanvasPreset(canvasPresetId);
   const languages = (job.languages ?? ["en"]) as Locale[];
+  const devicePresetIds = ((job.devicePresetIds?.length ? job.devicePresetIds : [canvasPresetId]) as CanvasPresetId[]);
+  const includeFeatureGraphic = job.includeFeatureGraphic ?? false;
+  const selectionMatrix = (job.selectionMatrix ?? null) as ExportMatrixSelection | null;
 
-  const total = uploaded.length * languages.length;
+  const total = (selectionMatrix ? summarizeExportMatrix(selectionMatrix).total : uploaded.length * languages.length * devicePresetIds.length) + (includeFeatureGraphic ? languages.length : 0);
   let done = 0;
 
   await queries.updateExportJob(db, jobId, {
@@ -65,23 +67,86 @@ export async function runExportJob(jobId: string) {
   try {
     for (let i = 0; i < uploaded.length; i++) {
       const ss = uploaded[i]!;
-      const localized = (ss.localized ?? {}) as Record<string, { title: string; accent?: string }>;
+      const localized = (ss.localized ?? {}) as Record<string, { title: string; accent?: string; subtitle?: string }>;
       const rawBuffer = await getObject(BUCKETS.raw(), ss.rawKey!);
 
       for (const locale of languages) {
         const text = localized[locale] ?? localized.en;
         if (!text?.title) {
-          done++;
+          done += selectionMatrix
+            ? devicePresetIds.filter((devicePresetId) => {
+                const selection = selectionMatrix?.[devicePresetId]?.[ss.id]?.[locale];
+                return selection === "on" || selection === "locked";
+              }).length
+            : devicePresetIds.length;
           await updateProgress(jobId, total, done, i, locale, "skipped (no title)");
           continue;
         }
-        const png = await renderWithTheme(
-          { source: rawBuffer, title: text.title, accent: text.accent },
-          theme,
-          { width: canvas.width, height: canvas.height }
-        );
+        const overrides = (ss.renderOverrides ?? {}) as { scene?: StoreScreenshotScene };
 
-        const key = keyForExportPng(jobId, i, locale);
+        for (const devicePresetId of devicePresetIds) {
+          const selection = selectionMatrix?.[devicePresetId]?.[ss.id]?.[locale];
+          if (selectionMatrix && selection !== "on" && selection !== "locked") continue;
+          const baseScene =
+            overrides.scene ??
+            createDefaultScene({
+              canvasPresetId,
+              title: text.title,
+              accent: text.accent,
+            });
+          const scene = adaptSceneToPreset(baseScene, devicePresetId);
+          const canvas = getCanvasPreset(devicePresetId) ?? getCanvasPreset(canvasPresetId) ?? { width: 1284, height: 2778, label: 'iPhone 6.7"' };
+          const png = await renderScene({
+            source: rawBuffer,
+            scene,
+            canvas: { width: canvas.width, height: canvas.height },
+            localeText: { title: text.title, accent: text.accent, subtitle: text.subtitle },
+          });
+
+          const key = keyForExportPng(jobId, i, locale, devicePresetId);
+          await putObject({
+            bucket: BUCKETS.exports(),
+            key,
+            body: png,
+            contentType: "image/png",
+          });
+          renderedKeys.push(key);
+          done++;
+          await updateProgress(jobId, total, done, i, locale, `rendered ${devicePresetId}`);
+        }
+      }
+    }
+
+    if (includeFeatureGraphic) {
+      const hero = uploaded[0]!;
+      const localized = (hero.localized ?? {}) as Record<string, { title: string; accent?: string; subtitle?: string }>;
+      const rawBuffer = await getObject(BUCKETS.raw(), hero.rawKey!);
+
+      for (const locale of languages) {
+        const text = localized[locale] ?? localized.en;
+        if (!text?.title) {
+          done++;
+          await updateProgress(jobId, total, done, uploaded.length, locale, "skipped feature graphic");
+          continue;
+        }
+
+        const overrides = (hero.renderOverrides ?? {}) as { scene?: StoreScreenshotScene };
+        const baseScene =
+          overrides.scene ??
+          createDefaultScene({
+            canvasPresetId,
+            title: text.title,
+            accent: text.accent,
+          });
+        const scene = buildFeatureGraphicScene(baseScene, text.title, text.accent, text.subtitle);
+        const png = await renderScene({
+          source: rawBuffer,
+          scene,
+          canvas: { width: 1024, height: 500 },
+          localeText: { title: text.title, accent: text.accent, subtitle: text.subtitle },
+        });
+
+        const key = keyForFeatureGraphic(jobId, locale);
         await putObject({
           bucket: BUCKETS.exports(),
           key,
@@ -90,7 +155,7 @@ export async function runExportJob(jobId: string) {
         });
         renderedKeys.push(key);
         done++;
-        await updateProgress(jobId, total, done, i, locale, "rendered");
+        await updateProgress(jobId, total, done, uploaded.length, locale, "rendered feature graphic");
       }
     }
 
@@ -124,6 +189,100 @@ export async function runExportJob(jobId: string) {
       }
     }
   }
+}
+
+function adaptSceneToPreset(scene: StoreScreenshotScene, canvasPresetId: CanvasPresetId): StoreScreenshotScene {
+  const device = scene.device ?? {
+    enabled: true,
+    kind: "iphone" as const,
+    frameStyle: "bezel" as const,
+    padding: 26,
+    radius: 64,
+    shadow: "strong" as const,
+    tilt: 0,
+    hideStatusBar: false,
+  };
+  const screenshot = scene.screenshot ?? {
+    x: 0.5,
+    y: 0.46,
+    width: 0.54,
+    scale: 1,
+    rotation: 0,
+    fit: "contain" as const,
+  };
+  return {
+    ...scene,
+    canvasPresetId,
+    device: {
+      ...device,
+      kind:
+        canvasPresetId.startsWith("ipad")
+          ? "ipad"
+          : canvasPresetId === "android" || canvasPresetId === "galaxy" || canvasPresetId === "playPhone"
+            ? "android"
+            : "iphone",
+    },
+    screenshot: {
+      ...screenshot,
+      width:
+        canvasPresetId.startsWith("ipad")
+          ? 0.68
+          : canvasPresetId === "android" || canvasPresetId === "galaxy" || canvasPresetId === "playPhone"
+            ? 0.58
+            : screenshot.width,
+    },
+  };
+}
+
+function buildFeatureGraphicScene(scene: StoreScreenshotScene, title: string, accent?: string, subtitle?: string): StoreScreenshotScene {
+  return {
+    ...scene,
+    canvasPresetId: "featureGraphic",
+    layoutPreset: "card",
+    device: {
+      ...scene.device,
+      enabled: true,
+      frameStyle: "minimal",
+      tilt: -3,
+      padding: 18,
+      radius: 38,
+    },
+    screenshot: {
+      ...scene.screenshot,
+      x: 0.77,
+      y: 0.56,
+      width: 0.33,
+      scale: 1,
+      rotation: 0,
+    },
+    textBlocks: scene.textBlocks.map((block) => {
+      if (block.id === "title") {
+        return {
+          ...block,
+          text: title,
+          accent,
+          x: 0.08,
+          y: 0.16,
+          width: 0.42,
+          align: "left",
+          fontSize: 0.112,
+        };
+      }
+      if (block.id === "subtitle") {
+        return {
+          ...block,
+          text: subtitle ?? "",
+          x: 0.08,
+          y: 0.44,
+          width: 0.34,
+          align: "left",
+          fontSize: 0.038,
+        };
+      }
+      return block;
+    }),
+    callouts: [],
+  };
 }
 
 async function updateProgress(

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ApiError, defineRoute } from "@/lib/api-handler";
 import { getDb, queries } from "@shotwise/db";
 import { BUCKETS, getObject } from "@shotwise/storage";
-import { getTheme, getCanvasPreset, renderWithTheme } from "@shotwise/core";
+import { createDefaultScene, getCanvasPreset, renderScene, type CanvasPresetId, type StoreScreenshotScene } from "@shotwise/core";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -27,16 +27,17 @@ export const POST = defineRoute({ auth: true, body: Body }, async ({ user, body 
   const text = localized[body.locale] ?? localized.en ?? { title: project.name };
   if (!text.title) throw new ApiError(400, "No title set for this locale");
 
-  const theme = getTheme(body.themeId);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const canvas = getCanvasPreset(body.canvasPresetId as any);
+  const overrides = (ss.renderOverrides ?? {}) as { scene?: StoreScreenshotScene };
+  const scene = overrides.scene ?? createDefaultScene({ canvasPresetId: body.canvasPresetId, title: text.title, accent: text.accent });
+  const canvas = getCanvasPreset((scene.canvasPresetId || body.canvasPresetId) as CanvasPresetId);
   const raw = await getObject(BUCKETS.raw(), ss.rawKey);
 
-  const png = await renderWithTheme(
-    { source: raw, title: text.title, accent: text.accent },
-    theme,
-    { width: canvas.width, height: canvas.height }
-  );
+  const png = await renderScene({
+    source: raw,
+    scene,
+    canvas: { width: canvas.width, height: canvas.height },
+    localeText: { title: text.title, accent: text.accent },
+  });
 
   return new NextResponse(new Uint8Array(png), {
     status: 200,

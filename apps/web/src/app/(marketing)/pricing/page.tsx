@@ -1,3 +1,4 @@
+import * as React from "react";
 import Link from "next/link";
 import "./pricing.css";
 
@@ -7,89 +8,92 @@ export default function PricingPage() {
       {/* HERO */}
       <section className="pr-hero container" data-slot="pricing-hero">
         <h1>
-          Pay once. Get credits. <em>No surprise bills.</em>
+          Free open-source screenshot studio. <em>No pricing wall.</em>
         </h1>
         <p>
-          5 free credits on signup. $4.99 for a starter pack of 100 credits, plus 20 free credits
-          every month going forward. Top up anytime with $2.99 → 50 credits.
+          Shotwise is built around the local Studio path: no login, no billing, no cloud storage,
+          no generation key. Clone it, run it, and export App Store / Google Play screenshots from
+          your browser.
         </p>
       </section>
 
-      {/* PLANS */}
+      {/* INCLUDED */}
       <section className="pr-grid container" data-slot="pricing-plans">
-        <div className="plan" data-plan="trial">
-          <div className="plan-name">Trial</div>
-          <h3>Try Shotwise</h3>
+        <div className="plan" data-plan="local">
+          <div className="plan-name">Local Studio</div>
+          <h3>Design without accounts</h3>
           <div className="price">
             <span className="amt">$0</span>
-            <span className="per">on signup</span>
+            <span className="per">forever</span>
           </div>
-          <p className="price-alt">No card required</p>
+          <p className="price-alt">No card, no sign-in</p>
           <p className="lead">
-            Enough credits to render one small launch and see the full pipeline end-to-end.
+            Projects, screenshot blobs, template choices, device settings, and scene JSON live in
+            IndexedDB on your machine.
           </p>
           <ul>
-            <li>5 free credits</li>
-            <li>All 9 languages</li>
-            <li>Full AI wizard</li>
-            <li>Manual editor</li>
+            <li>No-login Studio at `/studio`</li>
+            <li>Template gallery</li>
+            <li>Unlimited local editing</li>
             <li>Watermark-free output</li>
+            <li>SKILL.md agent workflow</li>
           </ul>
           <div className="cta">
-            <Link href="/sign-up" className="btn btn-ghost">Start free</Link>
-            <div className="micro">no card, no expiry</div>
+            <Link href="/studio" className="btn btn-ghost">Open Studio</Link>
+            <div className="micro">works after pnpm install</div>
           </div>
         </div>
 
-        <div className="plan feat" data-plan="starter">
-          <span className="plan-badge">Most popular</span>
+        <div className="plan feat" data-plan="templates">
+          <span className="plan-badge">Included</span>
           <div className="plan-name">
-            Starter pack <span className="pill pill-coral">★</span>
+            Templates <span className="pill pill-coral">★</span>
           </div>
-          <h3>Ship your first app</h3>
+          <h3>Start from a real layout</h3>
           <div className="price">
-            <span className="amt">$4.99</span>
-            <span className="per">one-time</span>
+            <span className="amt">20+</span>
+            <span className="per">templates</span>
           </div>
-          <p className="price-alt">Includes monthly credit refill</p>
+          <p className="price-alt">Color themes and device previews</p>
           <p className="lead">
-            Pay once, become an active member. We add 20 free credits to your account each month
-            for as long as you keep using Shotwise.
+            Choose from App Store, Play Store, before/after, feature zoom, social proof, paywall,
+            onboarding, dark premium, minimal utility, and two-screen story templates.
           </p>
           <ul>
-            <li>100 credits immediately</li>
-            <li>+20 free credits every month</li>
-            <li>No watermark</li>
-            <li>Priority email support</li>
-            <li>Re-export with no extra credit</li>
+            <li>Two screenshot canvas</li>
+            <li>Per-device preview tabs</li>
+            <li>iPhone, Android, iPad, tablet presets</li>
+            <li>Theme picker</li>
+            <li>Per-slot positioning</li>
           </ul>
           <div className="cta">
-            <Link href="/credits" className="btn btn-primary">Get starter pack</Link>
-            <div className="micro">processed by Paddle · VAT handled</div>
+            <Link href="/studio" className="btn btn-primary">Start from template</Link>
+            <div className="micro">manual-first, no AI dependency</div>
           </div>
         </div>
 
-        <div className="plan" data-plan="topup">
-          <div className="plan-name">Top up</div>
-          <h3>Need more credits?</h3>
+        <div className="plan" data-plan="export">
+          <div className="plan-name">Export</div>
+          <h3>Generate upload-ready files</h3>
           <div className="price">
-            <span className="amt">$2.99</span>
-            <span className="per">per pack</span>
+            <span className="amt">ZIP</span>
+            <span className="per">local</span>
           </div>
-          <p className="price-alt">Available after first purchase</p>
+          <p className="price-alt">PNG and ZIP outputs</p>
           <p className="lead">
-            Power users can top up anytime. Credits never expire as long as your account is
-            active.
+            Export selected devices and locales into stable folders with filenames that match the
+            screen names you set in Studio.
           </p>
           <ul>
-            <li>50 credits per pack</li>
-            <li>No subscription</li>
-            <li>Stack with monthly refill</li>
-            <li>Never expires</li>
+            <li>Locale folders</li>
+            <li>Device folders</li>
+            <li>Custom screen names</li>
+            <li>App Store sizes</li>
+            <li>Google Play sizes</li>
           </ul>
           <div className="cta">
-            <Link href="/credits" className="btn btn-ghost">Top up</Link>
-            <div className="micro">buy as many as you need</div>
+            <Link href="/studio" className="btn btn-ghost">Build export set</Link>
+            <div className="micro">browser-side workflow</div>
           </div>
         </div>
       </section>
@@ -98,89 +102,84 @@ export default function PricingPage() {
       <section className="compare container" data-slot="pricing-compare">
         <div className="compare-head">
           <span className="eyebrow">// Side by side</span>
-          <h2>What 1 credit buys you.</h2>
+          <h2>What is included.</h2>
         </div>
         <div className="ctable">
           <div className="crow head">
-            <div>Item</div>
-            <div>Credits</div>
+            <div>Area</div>
+            <div>Mode</div>
             <div>Result</div>
           </div>
           <div className="crow">
-            <div>1 source screen</div>
-            <div>1 credit</div>
-            <div>Rendered in every selected locale (up to 9 languages)</div>
-          </div>
-          <div className="crow">
-            <div>10-screen wizard run</div>
-            <div>10 credits</div>
-            <div>90 PNGs across 9 locales + ZIP</div>
-          </div>
-          <div className="crow">
-            <div>AI title regeneration</div>
+            <div>Manual editing</div>
             <div>Free</div>
-            <div>Unlimited title proposals before you commit to an export</div>
+            <div>Unlimited canvas edits, layout tweaks, previews, and screen setup</div>
           </div>
           <div className="crow">
-            <div>Pixel-perfect preview</div>
-            <div>Free</div>
-            <div>Server-side render to verify before spending credits</div>
+            <div>Single PNG</div>
+            <div>Local</div>
+            <div>One screen in one selected language</div>
           </div>
           <div className="crow">
-            <div>Failed export</div>
-            <div>Refunded</div>
-            <div>If the job fails, credits go right back to your ledger</div>
+            <div>10-screen multi-locale export</div>
+            <div>Local ZIP</div>
+            <div>PNG files grouped by locale, device, and screen name</div>
+          </div>
+          <div className="crow">
+            <div>Device preview</div>
+            <div>Local</div>
+            <div>Tabs for each selected phone or tablet preset</div>
+          </div>
+          <div className="crow">
+            <div>Agent workflow</div>
+            <div>SKILL.md</div>
+            <div>Tell a coding agent where screenshots live and which locales to prepare</div>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
       <section className="pr-faq container" data-slot="pricing-faq">
-        <h2>Pricing questions</h2>
+        <h2>Open-source questions</h2>
         <div className="pr-faq-grid">
           <details open>
-            <summary>Is this a subscription?</summary>
+            <summary>Do I need an account?</summary>
             <p>
-              No. You pay $4.99 once for the starter pack. As long as your account stays active,
-              we add 20 free credits to it every month at no extra cost. You can stop using
-              Shotwise at any time — no recurring charge.
+              No. The default workflow is `/studio`, and it runs locally in your browser.
             </p>
           </details>
           <details>
-            <summary>What does &quot;active&quot; mean?</summary>
+            <summary>Does it generate copy automatically?</summary>
             <p>
-              You bought the starter pack and you log in at least once in a 6-month window. We
-              don&apos;t expire credits or kick anyone out — we just need an indication that
-              someone is still using the account before granting monthly refills.
+              No. Shotwise is a manual editor. Agents can use `SKILL.md` to prepare scene JSON,
+              copy, filenames, and locales from your local files.
             </p>
           </details>
           <details>
-            <summary>What payment methods?</summary>
+            <summary>Where are screenshots stored?</summary>
             <p>
-              Card, Apple Pay, Google Pay, and SEPA — billed through Paddle, who handles VAT for
-              EU customers and sales tax in the US.
+              Local Studio stores them in browser storage. You can export scene JSON and ZIP files
+              whenever you want.
             </p>
           </details>
           <details>
-            <summary>Refunds?</summary>
+            <summary>Can I publish commercial app screenshots with it?</summary>
             <p>
-              Yes — within 14 days of purchase, no questions asked. Email yusuf@shotwise.app from
-              the address you signed up with.
+              Yes. The project is MIT licensed, and local exports are watermark-free.
             </p>
           </details>
           <details>
-            <summary>What if a render fails?</summary>
+            <summary>Can I add my own templates?</summary>
             <p>
-              If our export pipeline fails mid-run, the debited credits are refunded
-              automatically to your ledger so you can try again without losing anything.
+              Yes. Add definitions to the template registry, include preview metadata, and verify
+              with the template validation tests.
             </p>
           </details>
           <details>
-            <summary>Team plan?</summary>
+            <summary>Does it support iPad and Android?</summary>
             <p>
-              Not yet. Right now Shotwise is built for solo founders and indie devs. If you need
-              multi-seat workspaces, email us — we&apos;re prioritizing what people actually ask
-              for.
+              Yes. The local Studio includes iPhone, iPad, Android phone, foldable, and tablet
+              presets with per-device preview tabs.
             </p>
           </details>
         </div>
@@ -201,13 +200,13 @@ export default function PricingPage() {
           }}
         >
           <div>
-            <h2 style={{ color: "var(--cream)", fontSize: 36 }}>Trial is free forever.</h2>
+            <h2 style={{ color: "var(--cream)", fontSize: 36 }}>Local Studio is free forever.</h2>
             <p style={{ color: "rgba(245,239,230,0.7)", marginTop: 10 }}>
-              Five credits on signup. One small launch. Zero commitment.
+              Start from templates, design locally, and export PNG/ZIP without an account.
             </p>
           </div>
-          <Link href="/sign-up" className="btn btn-coral btn-lg">
-            Start free →
+          <Link href="/studio" className="btn btn-coral btn-lg">
+            Open Studio →
           </Link>
         </div>
       </section>

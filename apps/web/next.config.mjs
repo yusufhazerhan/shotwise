@@ -6,15 +6,17 @@ const nextConfig = {
     "@shotwise/types",
     "@shotwise/db",
     "@shotwise/auth",
-    "@shotwise/ai",
     "@shotwise/storage",
-    "@shotwise/billing",
     "@shotwise/credits",
     "@shotwise/ui-primitives",
   ],
   serverExternalPackages: ["sharp", "@aws-sdk/client-s3"],
   output: "standalone",
   poweredByHeader: false,
+  devIndicators: false,
+  experimental: {
+    devtoolSegmentExplorer: false,
+  },
   webpack: (config) => {
     config.resolve.extensionAlias = {
       ...(config.resolve.extensionAlias ?? {}),

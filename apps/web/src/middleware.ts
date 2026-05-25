@@ -1,33 +1,24 @@
 /**
- * Next.js middleware — gates the authenticated app routes.
+ * Next.js middleware - sends legacy account-backed routes back to local Studio.
  *
- * For simplicity we look for a Better-Auth session cookie; full session
- * validation happens in the route handlers via `requireUser()`.
+ * The open-source product defaults to `/studio`, so direct visits to the old
+ * account-backed app should not surface a login wall.
  */
 import { NextResponse, type NextRequest } from "next/server";
 
-const PROTECTED_PREFIXES = ["/dashboard", "/editor", "/wizard", "/projects", "/credits", "/account"];
-
-const SESSION_COOKIE_NAMES = [
-  "better-auth.session_token",
-  "__Secure-better-auth.session_token",
-];
+const PROTECTED_PREFIXES = ["/dashboard", "/editor", "/projects", "/credits", "/account"];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   if (!PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
-  const hasSession = SESSION_COOKIE_NAMES.some((n) => req.cookies.get(n));
-  if (!hasSession) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/sign-in";
-    url.searchParams.set("next", pathname);
-    return NextResponse.redirect(url);
-  }
-  return NextResponse.next();
+  const url = req.nextUrl.clone();
+  url.pathname = "/studio";
+  url.searchParams.delete("next");
+  return NextResponse.redirect(url);
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/editor/:path*", "/wizard/:path*", "/projects/:path*", "/credits/:path*", "/account/:path*"],
+  matcher: ["/dashboard/:path*", "/editor/:path*", "/projects/:path*", "/credits/:path*", "/account/:path*"],
 };

@@ -48,13 +48,18 @@ export function keyForRawScreenshot(projectId: string, screenshotId: string, ext
   return `projects/${projectId}/raw/${screenshotId}.${ext}`;
 }
 
-export function keyForExportPng(jobId: string, screenIndex: number, locale: string) {
+export function keyForExportPng(jobId: string, screenIndex: number, locale: string, devicePresetId?: string) {
   const padded = String(screenIndex + 1).padStart(2, "0");
-  return `jobs/${jobId}/${locale}/${padded}.png`;
+  const device = devicePresetId ? `${devicePresetId}/` : "";
+  return `jobs/${jobId}/${device}${locale}/${padded}.png`;
 }
 
 export function keyForExportZip(jobId: string) {
   return `jobs/${jobId}/shotwise-${jobId}.zip`;
+}
+
+export function keyForFeatureGraphic(jobId: string, locale: string) {
+  return `jobs/${jobId}/feature-graphic/${locale}/feature-graphic.png`;
 }
 
 export interface SignedUrlOpts {

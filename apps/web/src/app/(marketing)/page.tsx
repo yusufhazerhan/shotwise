@@ -1,3 +1,4 @@
+import * as React from "react";
 import Link from "next/link";
 import "./landing.css";
 
@@ -9,25 +10,26 @@ export default function LandingPage() {
         <div className="container hero-grid">
           <div className="fade-up">
             <span className="hero-eyebrow">
-              <span className="dot">★</span> Now in public beta — 9 languages on day one
+              <span className="dot">★</span> Open source, manual-first, shipping now
             </span>
-            <h1>App&nbsp;Store screenshots, in 5&nbsp;minutes.</h1>
+            <h1>App&nbsp;Store screenshots you can actually control.</h1>
             <p className="sub">
-              AI writes the marketing copy. A sharp engine renders the visuals. You ship in 9
-              languages — no Figma, no designer, no excuses.
+              Shotwise is a calm screenshot builder for indie teams. Manual editing is unlimited,
+              local-first flows work in your browser, and coding agents can use SKILL.md when you
+              want a vibe-coding workflow.
             </p>
             <div className="hero-ctas">
-              <Link href="/wizard/new" className="btn btn-primary btn-lg">
-                Start free →
+              <Link href="/studio" className="btn btn-primary btn-lg">
+                Open local Studio →
               </Link>
-              <Link href="#demo" className="btn btn-ghost btn-lg">
-                ▶ See 90-second demo
+              <Link href="#local-mode" className="btn btn-ghost btn-lg">
+                Explore local mode
               </Link>
             </div>
             <div className="hero-meta">
-              <span>No credit card</span>
-              <span>5 free credits</span>
-              <span>iOS & Android</span>
+              <span>No prompts required</span>
+              <span>No sign-in local mode</span>
+              <span>Open source</span>
             </div>
           </div>
 
@@ -91,8 +93,9 @@ export default function LandingPage() {
             <span className="eyebrow">// How it works</span>
             <h2>Three steps from raw capture to shippable asset.</h2>
             <p>
-              Drop your simulator screenshots in, answer three questions about your app, and
-              download a 9-locale ZIP. The AI handles the words; the renderer handles the pixels.
+              Drop your simulator screenshots in, set the story you want to tell, and export a
+              store-ready ZIP. Use the SKILL.md workflow if you want vibe-coding automation, or stay fully manual from the
+              first screen.
             </p>
           </div>
           <div className="steps">
@@ -109,10 +112,10 @@ export default function LandingPage() {
             </div>
             <div className="step" data-slot="how-step" data-step="2">
               <span className="step-num">02 / Describe</span>
-              <h3>Tell the AI about your app</h3>
+              <h3>Shape the story, not just the pixels</h3>
               <p>
-                Three short fields — name, what it does, who it&apos;s for. The AI uses them to
-                write titles that match your tone and your features.
+                Add the name, what it does, who it&apos;s for, and any design notes. The brief
+                maps directly to templates, locales, screen names, and export settings.
               </p>
               <div className="step-mock">
                 <div className="fields">
@@ -124,10 +127,10 @@ export default function LandingPage() {
             </div>
             <div className="step" data-slot="how-step" data-step="3">
               <span className="step-num">03 / Generate</span>
-              <h3>Pick languages, hit go</h3>
+              <h3>Pick languages, then export only what you need</h3>
               <p>
-                Tick the locales you ship in. We render each screenshot at App Store dimensions,
-                package the ZIP, and you&apos;re back to building.
+                Tick the locales and device sizes you ship in. The export matrix keeps every final
+                PNG explicit before you export.
               </p>
               <div className="step-mock">
                 <div className="langs">
@@ -150,28 +153,28 @@ export default function LandingPage() {
           </div>
           <div className="modes">
             <div className="mode">
-              <span className="eyebrow">Wizard mode</span>
-              <h3 style={{ marginTop: 8 }}>AI guides you through 6 steps.</h3>
+              <span className="eyebrow">SKILL.md workflow</span>
+              <h3 style={{ marginTop: 8 }}>Agents can drive the repo from local files.</h3>
               <p style={{ marginTop: 10 }}>
-                For solo founders who want a polished result in five minutes flat — no design
-                vocabulary required.
+                For solo founders who want a faster draft. Point your coding agent at SKILL.md,
+                your screenshots, and the locales you need.
               </p>
               <div className="feat">
-                <div>AI-written titles per screen</div>
-                <div>Suggested style presets</div>
-                <div>Auto-translates to 9 locales</div>
-                <div>One-click ZIP export</div>
+                <div>Template and scene instructions</div>
+                <div>Locale copy structure</div>
+                <div>Export folder naming rules</div>
+                <div>Visual QA checklist</div>
               </div>
               <div style={{ marginTop: 20 }}>
-                <Link href="/wizard/new" className="btn btn-primary btn-sm">Try the wizard →</Link>
+                <Link href="/studio" className="btn btn-primary btn-sm">Start from template →</Link>
               </div>
             </div>
             <div className="mode dark">
               <span className="eyebrow">Manual mode</span>
               <h3 style={{ marginTop: 8 }}>Pixel-level control, designer-grade.</h3>
               <p style={{ marginTop: 10 }}>
-                For designers who already have a vision. Tweak typography, gradients, shadows and
-                crops per screen.
+                For teams who want zero lock-in. Tweak typography, gradients, device frames,
+                callouts, crops, locales, and output matrices per screen.
               </p>
               <div className="feat">
                 <div>Per-screen font + weight + size</div>
@@ -180,7 +183,48 @@ export default function LandingPage() {
                 <div>Save and reuse presets</div>
               </div>
               <div style={{ marginTop: 20 }}>
-                <Link href="/editor/new" className="btn btn-coral btn-sm">Open the editor →</Link>
+                <Link href="/studio" className="btn btn-coral btn-sm">Open local Studio →</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="block" id="local-mode" data-slot="local-mode">
+        <div className="container">
+          <div className="block-head">
+            <span className="eyebrow">// Local mode</span>
+            <h2>Works locally. Works without lock-in.</h2>
+            <p>
+              The core product is a real screenshot editor, not a thin prompt box. Keep everything
+              manual, stay in control, and export local PNG/ZIP files without signing in.
+            </p>
+          </div>
+          <div className="modes">
+            <div className="mode">
+              <span className="eyebrow">Open source core</span>
+              <h3 style={{ marginTop: 8 }}>Build your screenshot system in the open.</h3>
+              <p style={{ marginTop: 10 }}>
+                Style presets, export matrix logic, scene rendering, and manual editing are being
+                shaped as an open product foundation we can keep evolving in public.
+              </p>
+              <div className="feat">
+                <div>Manual editor stays first-class</div>
+                <div>Manual project files stay local</div>
+                <div>Templates and export presets are reusable</div>
+              </div>
+            </div>
+            <div className="mode">
+              <span className="eyebrow">Vibe coding</span>
+              <h3 style={{ marginTop: 8 }}>Use your coding agent outside the app.</h3>
+              <p style={{ marginTop: 10 }}>
+                Preview, tweak, restyle, duplicate, reorder, and localize as much as you want.
+                The app stays manual; SKILL.md teaches agents how to prepare the project files.
+              </p>
+              <div className="feat">
+                <div>Unlimited manual editing</div>
+                <div>Local PNG and ZIP export</div>
+                <div>Agent instructions stay in the repo</div>
               </div>
             </div>
           </div>
@@ -194,8 +238,8 @@ export default function LandingPage() {
             <span className="eyebrow">// Multi-locale built-in</span>
             <h2>One screenshot. Nine&nbsp;languages. Zero copy-paste.</h2>
             <p>
-              Each render uses locale-aware line breaking, font fallbacks for CJK, and AI
-              translations reviewed for marketing tone — not literal.
+              Each render uses locale-aware line breaking, font fallbacks for CJK, and a preview
+              loop that keeps English anchored while the rest of the set stays editable.
             </p>
           </div>
           <div className="locale-grid">
@@ -210,50 +254,51 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── PRICING TEASE ───────────────────────────────────────────── */}
+      {/* ── OSS TEASE ───────────────────────────────────────────────── */}
       <section className="block" data-slot="pricing-tease">
         <div className="container">
           <div className="block-head">
-            <span className="eyebrow">// Pricing</span>
-            <h2>Pay once. Get credits. No surprise bills.</h2>
+            <span className="eyebrow">// Open source</span>
+            <h2>Free local Studio. No account layer in the way.</h2>
             <p>
-              5 credits on signup. $4.99 for a starter pack of 100 credits plus 20 free every
-              month going forward. Top up $2.99 → 50 credits whenever you need more.
+              Clone the repo, start the web app, open `/studio`, and design store-ready screenshot
+              sets directly in the browser.
             </p>
           </div>
           <div className="price-grid">
-            <div className="tier" data-slot="plan-card" data-plan="trial">
-              <div className="tier-name">Trial</div>
-              <div className="price"><span className="amt">$0</span><span className="per">on signup</span></div>
+            <div className="tier" data-slot="plan-card" data-plan="local">
+              <div className="tier-name">Local Studio</div>
+              <div className="price"><span className="amt">$0</span><span className="per">forever</span></div>
               <ul>
-                <li>5 free credits</li>
-                <li>All AI features</li>
-                <li>9 languages</li>
-                <li>No card required</li>
+                <li>No login</li>
+                <li>No seed account</li>
+                <li>No hosted storage</li>
+                <li>No generation key</li>
               </ul>
-              <Link href="/sign-up" className="btn btn-ghost">Start free</Link>
+              <Link href="/studio" className="btn btn-ghost">Open Studio</Link>
             </div>
-            <div className="tier feat" data-slot="plan-card" data-plan="starter">
-              <div className="tier-badge">Most popular</div>
-              <div className="tier-name">Starter pack</div>
-              <div className="price"><span className="amt">$4.99</span><span className="per">one-time</span></div>
+            <div className="tier feat" data-slot="plan-card" data-plan="templates">
+              <div className="tier-badge">Included</div>
+              <div className="tier-name">Template system</div>
+              <div className="price"><span className="amt">20+</span><span className="per">layouts</span></div>
               <ul>
-                <li>100 credits</li>
-                <li>+20 free credits every month</li>
-                <li>No watermark</li>
-                <li>Cancel anytime — no recurring charge</li>
+                <li>Two-screen stories</li>
+                <li>iPhone, Android, iPad, tablet presets</li>
+                <li>Color themes</li>
+                <li>Per-device previews</li>
               </ul>
-              <Link href="/credits" className="btn btn-primary">Get starter pack</Link>
+              <Link href="/studio" className="btn btn-primary">Start from template</Link>
             </div>
-            <div className="tier" data-slot="plan-card" data-plan="topup">
-              <div className="tier-name">Top up</div>
-              <div className="price"><span className="amt">$2.99</span><span className="per">per pack</span></div>
+            <div className="tier" data-slot="plan-card" data-plan="export">
+              <div className="tier-name">Export</div>
+              <div className="price"><span className="amt">PNG</span><span className="per">and ZIP</span></div>
               <ul>
-                <li>50 credits, one-time</li>
-                <li>Never expires</li>
-                <li>Available after first purchase</li>
+                <li>Locale folders</li>
+                <li>Device folders</li>
+                <li>Stable filenames</li>
+                <li>Store-ready sizes</li>
               </ul>
-              <Link href="/credits" className="btn btn-ghost">Top up</Link>
+              <Link href="/studio" className="btn btn-ghost">Export locally</Link>
             </div>
           </div>
         </div>
@@ -272,31 +317,23 @@ export default function LandingPage() {
               <p>
                 You can — and many designers will. Shotwise is for the part of the work Figma
                 doesn&apos;t do well: bulk-rendering nine locales at exact App Store dimensions,
-                with AI-written copy and font-aware line breaking. Use Figma for the brand. Use
+                with brief-based copy and font-aware line breaking. Use Figma for the brand. Use
                 Shotwise for the export.
               </p>
             </details>
             <details>
-              <summary>How does the AI actually work?</summary>
+              <summary>Can I use this with a coding agent?</summary>
               <p>
-                We pass your app description and a low-res preview of each screenshot to Gemini
-                Vision, which returns three title candidates per screen. You pick or rewrite.
-                Nothing is auto-published.
-              </p>
-            </details>
-            <details>
-              <summary>What does 1 credit get me?</summary>
-              <p>
-                1 source screen, rendered across every language you&apos;ve selected. A wizard
-                with 10 screens × 9 locales = 10 credits and 90 PNGs.
+                Yes. Use the root SKILL.md and tell your agent where your screenshots are, which
+                locales you need, and which template direction you want. The app itself remains a
+                manual editor.
               </p>
             </details>
             <details>
               <summary>What happens to my screenshots?</summary>
               <p>
-                We delete the raw uploads as soon as your export is finalized. The generated ZIP
-                stays available for 24 hours, then it&apos;s wiped too. Project metadata stays so
-                you can re-export later.
+                In local Studio they stay in your browser storage. Manual exports are generated
+                locally, and you can remove projects whenever you want.
               </p>
             </details>
           </div>
@@ -309,9 +346,9 @@ export default function LandingPage() {
           <div className="cta-strip">
             <div>
               <h2>Ship the next release this weekend.</h2>
-              <p>Five free credits. No credit card. Five minutes from drag to ZIP.</p>
+              <p>No sign-in. No seed data. Five minutes from drag to ZIP.</p>
             </div>
-            <Link href="/sign-up" className="btn btn-coral btn-lg">Start free →</Link>
+            <Link href="/studio" className="btn btn-coral btn-lg">Open local Studio →</Link>
           </div>
         </div>
       </section>

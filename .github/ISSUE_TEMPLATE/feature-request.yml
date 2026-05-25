@@ -1,0 +1,44 @@
+name: Feature request
+description: Suggest an improvement or new capability
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. Please anchor requests in the open-source local Studio direction when possible.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      placeholder: What workflow is blocked, slow, or awkward today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      placeholder: What would you like Shotwise to do?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      placeholder: Other ideas, workarounds, or related tools
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Which area does this touch?
+      options:
+        - Manual editor
+        - Templates and themes
+        - Device previews
+        - Export matrix
+        - Localization
+        - SKILL.md workflow
+        - Documentation
+        - Other
+    validations:
+      required: true

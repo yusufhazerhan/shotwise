@@ -4,12 +4,17 @@ import { getDb, queries } from "@shotwise/db";
 import { consumeForExport, InsufficientCreditsError, getBalance } from "@shotwise/credits";
 import { LOCALES } from "@shotwise/types";
 import { runExportJob } from "@/lib/export/run-export-job";
+import { getExportPlan } from "@/lib/export-cost";
+import { summarizeExportMatrix } from "@/lib/export-matrix";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
 const Body = z.object({
   languages: z.array(z.enum(LOCALES)).min(1),
+  devicePresetIds: z.array(z.string()).min(1).optional(),
+  includeFeatureGraphic: z.boolean().optional(),
+  selectionMatrix: z.record(z.record(z.record(z.enum(["on", "off", "locked"])))).optional(),
 });
 
 export const POST = defineRoute({ auth: true, body: Body }, async ({ user, body, params }) => {
@@ -21,7 +26,14 @@ export const POST = defineRoute({ auth: true, body: Body }, async ({ user, body,
   const uploaded = screenshots.filter((s) => s.status === "uploaded" && s.rawKey);
   if (uploaded.length === 0) throw new ApiError(400, "Upload screenshots before exporting");
 
-  const cost = uploaded.length; // 1 credit per source screen, across all locales
+  const selectionSummary = body.selectionMatrix ? summarizeExportMatrix(body.selectionMatrix) : null;
+  const plan = getExportPlan({
+    screenCount: uploaded.length,
+    languages: body.languages,
+    devicePresetIds: body.devicePresetIds,
+    includeFeatureGraphic: body.includeFeatureGraphic,
+  });
+  const cost = selectionSummary ? selectionSummary.total + (body.includeFeatureGraphic ? body.languages.length : 0) : plan.credits;
 
   const job = await queries.createExportJob(db, {
     projectId: project.id,
@@ -29,7 +41,10 @@ export const POST = defineRoute({ auth: true, body: Body }, async ({ user, body,
     status: "pending",
     creditsDebited: cost,
     languages: body.languages,
-    progress: { total: uploaded.length * body.languages.length, done: 0 },
+    devicePresetIds: body.devicePresetIds ?? [],
+    includeFeatureGraphic: body.includeFeatureGraphic ?? false,
+    selectionMatrix: body.selectionMatrix ?? null,
+    progress: { total: cost, done: 0 },
   });
 
   try {
@@ -55,5 +70,12 @@ export const POST = defineRoute({ auth: true, body: Body }, async ({ user, body,
     console.error("[export] background error", job.id, err);
   });
 
-  return { jobId: job.id, screenCount: cost, languages: body.languages };
+  return {
+    jobId: job.id,
+    screenCount: plan.screenCount,
+    finalImageCount: selectionSummary ? selectionSummary.total + (body.includeFeatureGraphic ? body.languages.length : 0) : plan.finalImageCount,
+    languages: body.languages,
+    devicePresetIds: body.devicePresetIds ?? [],
+    includeFeatureGraphic: body.includeFeatureGraphic ?? false,
+  };
 });

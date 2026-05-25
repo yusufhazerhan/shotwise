@@ -2,7 +2,23 @@
   "name": "shotwise",
   "version": "0.0.1",
   "private": true,
-  "description": "AI-powered App Store screenshot generator",
+  "description": "Open-source local-first App Store and Google Play screenshot builder with templates, device previews, localization, and PNG/ZIP export.",
+  "license": "MIT",
+  "keywords": [
+    "app-store-screenshots",
+    "google-play-screenshots",
+    "screenshot-generator",
+    "screenshot-editor",
+    "app-store-optimization",
+    "aso",
+    "iphone-mockup",
+    "android-mockup",
+    "ipad-screenshots",
+    "local-first",
+    "nextjs",
+    "typescript",
+    "sharp"
+  ],
   "workspaces": [
     "packages/*",
     "apps/*"

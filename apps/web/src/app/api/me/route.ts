@@ -1,17 +1,20 @@
 import { defineRoute } from "@/lib/api-handler";
 import { getDb, queries } from "@shotwise/db";
-import { getBalance } from "@shotwise/credits";
+import { getBalance, hasLifetimeAccess } from "@shotwise/credits";
 
 export const runtime = "nodejs";
 
 export const GET = defineRoute({ auth: true }, async ({ user }) => {
   const db = getDb();
-  const dbUser = await queries.getUserById(db, user.id);
-  const balance = await getBalance(user.id, db);
+  const [dbUser, balance, lifetimeActive] = await Promise.all([
+    queries.getUserById(db, user.id),
+    getBalance(user.id, db),
+    hasLifetimeAccess(user.id, db),
+  ]);
   return {
     id: user.id,
     email: user.email,
-    monthlyRefillActive: dbUser?.monthlyRefillActive ?? false,
+    lifetimeActive: lifetimeActive || (dbUser?.monthlyRefillActive ?? false),
     balance,
   };
 });

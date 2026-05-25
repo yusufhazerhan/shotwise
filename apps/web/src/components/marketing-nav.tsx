@@ -1,3 +1,4 @@
+import * as React from "react";
 import Link from "next/link";
 import { Logo } from "./logo";
 
@@ -9,12 +10,12 @@ export function MarketingNav() {
         <div className="spacer" />
         <div className="shot-nav-links">
           <Link href="/#how">How it works</Link>
+          <Link href="/studio">Local Studio</Link>
           <Link href="/#modes">Modes</Link>
-          <Link href="/pricing">Pricing</Link>
+          <Link href="/pricing">Free OSS</Link>
           <Link href="/#faq">FAQ</Link>
         </div>
-        <Link href="/sign-in" className="btn btn-ghost btn-sm">Sign in</Link>
-        <Link href="/sign-up" className="btn btn-primary btn-sm">Start free</Link>
+        <Link href="/studio" className="btn btn-primary btn-sm">Open Studio</Link>
       </div>
     </nav>
   );
@@ -28,27 +29,14 @@ export function MarketingFooter() {
           <div>
             <Logo />
             <p style={{ marginTop: 14, fontSize: 13.5, maxWidth: 280 }}>
-              App Store screenshots in 5 minutes — AI copy, sharp visuals, 9 locales.
+              Open-source, manual-first store screenshot builder.
             </p>
           </div>
           <div>
             <h5>Product</h5>
-            <Link href="/editor/new">Editor</Link>
-            <Link href="/wizard/new">Wizard</Link>
-            <Link href="/pricing">Pricing</Link>
-          </div>
-          <div>
-            <h5>Resources</h5>
-            <Link href="#">Docs</Link>
-            <Link href="#">App Store sizes</Link>
-            <Link href="#">Support</Link>
-          </div>
-          <div>
-            <h5>Company</h5>
-            <Link href="#">Twitter / X</Link>
-            <Link href="#">GitHub</Link>
-            <Link href="#">Terms</Link>
-            <Link href="#">Privacy</Link>
+            <Link href="/studio">Local Studio</Link>
+            <Link href="/studio">SKILL.md workflow</Link>
+            <Link href="/pricing">Free open-source</Link>
           </div>
         </div>
         <div className="shot-foot-base">

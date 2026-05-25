@@ -5,61 +5,11 @@ services:
     image: ghcr.io/${GITHUB_REPOSITORY:-shotwise/shotwise}:${IMAGE_TAG:-latest}
     container_name: shotwise-app
     restart: unless-stopped
-    env_file: ./.env
     environment:
       NODE_ENV: production
       PORT: 3000
-    depends_on:
-      postgres:
-        condition: service_healthy
-      minio:
-        condition: service_started
-    networks: [shotwise]
-
-  postgres:
-    image: postgres:16-alpine
-    container_name: shotwise-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-shotwise}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
-      POSTGRES_DB: ${POSTGRES_DB:-shotwise}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-shotwise} -d ${POSTGRES_DB:-shotwise}"]
-      interval: 5s
-      timeout: 5s
-      retries: 12
-    networks: [shotwise]
-
-  minio:
-    image: minio/minio:latest
-    container_name: shotwise-minio
-    restart: unless-stopped
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: ${S3_ACCESS_KEY_ID}
-      MINIO_ROOT_PASSWORD: ${S3_SECRET_ACCESS_KEY}
-    volumes:
-      - minio_data:/data
-    networks: [shotwise]
-
-  minio-init:
-    image: minio/mc:latest
-    container_name: shotwise-minio-init
-    depends_on:
-      minio:
-        condition: service_started
-    entrypoint: ["/bin/sh", "/init/init.sh"]
-    volumes:
-      - ./minio/init.sh:/init/init.sh:ro
-    environment:
-      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
-      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
-      S3_BUCKET_RAW: ${S3_BUCKET_RAW:-shotwise-raw}
-      S3_BUCKET_EXPORTS: ${S3_BUCKET_EXPORTS:-shotwise-exports}
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
     networks: [shotwise]
 
   caddy:
@@ -79,8 +29,6 @@ services:
     networks: [shotwise]
 
 volumes:
-  postgres_data:
-  minio_data:
   caddy_data:
   caddy_config:
 

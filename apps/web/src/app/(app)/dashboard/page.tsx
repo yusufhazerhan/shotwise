@@ -1,21 +1,26 @@
+import * as React from "react";
 import Link from "next/link";
 import "./dashboard.css";
 import { requireUser } from "@/lib/auth";
 import { getDb, queries } from "@shotwise/db";
-import { getBalance } from "@shotwise/credits";
+import type { CreditLedgerRow, Project } from "@shotwise/db";
+import { getBalance, hasLifetimeAccess } from "@shotwise/credits";
 
 export default async function DashboardPage() {
   const user = await requireUser();
   const db = getDb();
-  const [projects, balance, ledger, dbUser] = await Promise.all([
+  const [projectsResult, balance, ledgerResult, dbUser, lifetimeResult] = await Promise.all([
     queries.listProjects(db, user.id),
     getBalance(user.id, db),
     queries.listCreditLedger(db, user.id, 6),
     queries.getUserById(db, user.id),
+    hasLifetimeAccess(user.id, db),
   ]);
+  const projects = projectsResult as Project[];
+  const ledger = ledgerResult as CreditLedgerRow[];
 
   const firstName = (user.email || "there").split("@")[0]!.split(/[.+_-]/)[0]!;
-  const monthlyRefillActive = dbUser?.monthlyRefillActive ?? false;
+  const lifetimeActive = lifetimeResult || (dbUser?.monthlyRefillActive ?? false);
 
   return (
     <div data-slot="dashboard">
@@ -26,30 +31,30 @@ export default async function DashboardPage() {
           </h1>
           <p>
             You have <b>{balance} credits</b> on your account
-            {monthlyRefillActive
-              ? " · monthly refill active"
-              : " · activate the starter pack to unlock monthly refills"}.
+            {lifetimeActive
+              ? " · lifetime unlocked"
+              : " · server mode is optional"}.
           </p>
         </div>
         <div className="actions">
           {projects[0] && (
             <Link
-              href={`/${projects[0].mode === "wizard" ? "wizard" : "editor"}/${projects[0].id}`}
+              href={`/editor/${projects[0].id}`}
               className="btn btn-ghost"
             >
               Open last project →
             </Link>
           )}
-          <Link href="/wizard/new" className="btn btn-primary">+ New project</Link>
+          <Link href="/studio" className="btn btn-primary">Open local Studio</Link>
         </div>
       </section>
 
-      {!monthlyRefillActive && (
+      {!lifetimeActive && (
         <div className="upgrade-strip" data-slot="dashboard-upgrade">
           <div>
-            <div className="lab">★ You&apos;re on trial credits</div>
-            <h4>Unlock the starter pack — $4.99 for 100 credits + 20 free every month.</h4>
-            <p>Pay once. No subscription. Credits never expire while you&apos;re active.</p>
+            <div className="lab">Hosted convenience</div>
+            <h4>Local Studio is free. Hosted export credits are optional.</h4>
+            <p>Use server mode only when you want account-backed storage and hosted rendering.</p>
           </div>
           <div className="spacer" />
           <Link
@@ -59,7 +64,7 @@ export default async function DashboardPage() {
           >
             Compare
           </Link>
-          <Link href="/credits" className="btn btn-coral btn-sm">Get starter pack →</Link>
+          <Link href="/studio" className="btn btn-coral btn-sm">Use Local Studio →</Link>
         </div>
       )}
 
@@ -67,7 +72,7 @@ export default async function DashboardPage() {
         <div className="stat">
           <div className="lab">Credits</div>
           <div className="num">{balance}</div>
-          <div className="delta">{monthlyRefillActive ? "+20 next month" : "free trial"}</div>
+          <div className="delta">{lifetimeActive ? "lifetime" : "hosted only"}</div>
           <div className="icon">◆</div>
         </div>
         <div className="stat">
@@ -84,8 +89,8 @@ export default async function DashboardPage() {
         </div>
         <div className="stat">
           <div className="lab">Plan</div>
-          <div className="num" style={{ fontSize: 24 }}>{monthlyRefillActive ? "Active" : "Trial"}</div>
-          <div className="delta">{monthlyRefillActive ? "monthly refill on" : "starter pack pending"}</div>
+          <div className="num" style={{ fontSize: 24 }}>{lifetimeActive ? "Lifetime" : "Free"}</div>
+          <div className="delta">{lifetimeActive ? "unlocked" : "upgrade optional"}</div>
           <div className="icon">★</div>
         </div>
       </section>
@@ -96,21 +101,21 @@ export default async function DashboardPage() {
             <h3>Recent projects</h3>
             <span className="count">{projects.length} {projects.length === 1 ? "project" : "projects"}</span>
             <div className="spacer" />
-            <Link href="/wizard/new" className="btn btn-ghost btn-sm">+ New</Link>
+            <Link href="/studio" className="btn btn-ghost btn-sm">Start from template</Link>
           </div>
 
           {projects.length === 0 ? (
             <div className="empty card" data-slot="dashboard-empty">
               <h4>No projects yet.</h4>
-              <p>Start with the AI wizard — it&apos;s the fastest way to ship a launch.</p>
-              <Link href="/wizard/new" className="btn btn-primary btn-sm">+ Start wizard</Link>
+              <p>Start locally from a template, then add server sync only when you need it.</p>
+              <Link href="/studio" className="btn btn-primary btn-sm">Choose template</Link>
             </div>
           ) : (
             <div className="proj-grid">
               {projects.map((p) => (
                 <Link
                   key={p.id}
-                  href={`/${p.mode === "wizard" ? "wizard" : "editor"}/${p.id}`}
+                  href={`/editor/${p.id}`}
                   className="proj"
                   data-slot="dashboard-project-card"
                 >
@@ -155,11 +160,11 @@ export default async function DashboardPage() {
             )}
           </div>
           <Link
-            href="/credits"
+            href="/studio"
             className="btn btn-ghost btn-sm"
             style={{ width: "100%", justifyContent: "center", marginTop: 12 }}
           >
-            See all activity →
+            Open local Studio →
           </Link>
         </aside>
       </div>

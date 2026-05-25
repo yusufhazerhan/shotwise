@@ -3,7 +3,7 @@ import * as React from "react";
 
 interface CreditsState {
   balance: number;
-  monthlyRefillActive: boolean;
+  lifetimeActive: boolean;
   loading: boolean;
   refresh: () => Promise<void>;
 }
@@ -13,14 +13,14 @@ const CreditsContext = React.createContext<CreditsState | null>(null);
 export function CreditsProvider({
   children,
   initialBalance,
-  initialActive,
+  initialLifetimeActive,
 }: {
   children: React.ReactNode;
   initialBalance?: number;
-  initialActive?: boolean;
+  initialLifetimeActive?: boolean;
 }) {
   const [balance, setBalance] = React.useState(initialBalance ?? 0);
-  const [monthlyRefillActive, setActive] = React.useState(initialActive ?? false);
+  const [lifetimeActive, setActive] = React.useState(initialLifetimeActive ?? false);
   const [loading, setLoading] = React.useState(false);
 
   const refresh = React.useCallback(async () => {
@@ -28,9 +28,9 @@ export function CreditsProvider({
     try {
       const r = await fetch("/api/credits", { cache: "no-store" });
       if (r.ok) {
-        const data = (await r.json()) as { balance: number; monthlyRefillActive: boolean };
+        const data = (await r.json()) as { balance: number; lifetimeActive: boolean };
         setBalance(data.balance);
-        setActive(data.monthlyRefillActive);
+        setActive(data.lifetimeActive);
       }
     } finally {
       setLoading(false);
@@ -38,7 +38,7 @@ export function CreditsProvider({
   }, []);
 
   return (
-    <CreditsContext.Provider value={{ balance, monthlyRefillActive, loading, refresh }}>
+    <CreditsContext.Provider value={{ balance, lifetimeActive, loading, refresh }}>
       {children}
     </CreditsContext.Provider>
   );

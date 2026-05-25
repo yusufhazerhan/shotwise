@@ -2,10 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Shotwise — brand foundation. Ported from desing/shortwise/brand.css and
-   wired up to Tailwind tokens declared in tailwind.config.ts.
-   ───────────────────────────────────────────────────────────────────────── */
+/* Shotwise brand foundation wired to Tailwind tokens declared in tailwind.config.ts. */
 :root {
   --cream: #F5EFE6;
   --cream-2: #EFE7DA;
@@ -122,7 +119,7 @@ button { font-family: inherit; cursor: pointer; }
 
 /* ───────────── Logo ───────────── */
 .logo {
-  display: inline-flex; align-items: center; gap: 9px;
+  display: inline-flex; align-items: center; gap: 12px;
   font-weight: 800; font-size: 17px; letter-spacing: -0.02em; color: var(--ink);
 }
 .logo-mark {
@@ -163,7 +160,7 @@ button { font-family: inherit; cursor: pointer; }
 
 /* ───────────── Footer ───────────── */
 .shot-foot { margin-top: 80px; border-top: 1px solid var(--line); padding: 56px 0 40px; }
-.shot-foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+.shot-foot-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; }
 .shot-foot h5 { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 14px; }
 .shot-foot a { display: block; padding: 4px 0; color: var(--ink-soft); font-size: 13.5px; }
 .shot-foot a:hover { color: var(--ink); }

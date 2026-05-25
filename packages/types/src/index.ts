@@ -18,6 +18,19 @@ export type {
   BatchRenderResult,
   ThemeId,
   CanvasPresetId,
+  StoreScreenshotScene,
+  SceneBackground,
+  SceneLayoutPreset,
+  SceneDeviceKind,
+  SceneFrameStyle,
+  SceneTextRole,
+  SceneTextBlock,
+  SceneScreenshotTransform,
+  SceneScreenshotSlot,
+  SceneDeviceOptions,
+  SceneCallout,
+  SceneAdvancedOverrides,
+  SceneRenderOptions,
 } from "@shotwise/core";
 
 /** Supported locale codes for multi-language exports. */
@@ -104,17 +117,6 @@ export interface CreditLedgerEntry {
   createdAt: string;
 }
 
-/** Wizard mode in-memory state (mirrored to Zustand store). */
-export interface WizardState {
-  step: 1 | 2 | 3 | 4 | 5 | 6;
-  appMetadata: Partial<AppMetadata>;
-  screenshotIds: string[];
-  analysisStatus: "idle" | "running" | "done" | "error";
-  selectedThemeId: string;
-  selectedLanguages: Locale[];
-  exportJobId?: string;
-}
-
 /** Render config sent from the editor to the preview/export pipeline. */
 export interface ScreenRenderConfig {
   title: string;
@@ -132,17 +134,4 @@ export interface ScreenRenderConfig {
     cornerRadius?: number;
     shadowIntensity?: "none" | "subtle" | "strong";
   };
-}
-
-export type PaddleProductKind = "starter_pack" | "topup_50";
-
-export interface PaddleProduct {
-  kind: PaddleProductKind;
-  priceEnvVar: "PADDLE_PRICE_STARTER" | "PADDLE_PRICE_TOPUP";
-  /** USD price (display only — Paddle is source of truth). */
-  displayUsd: number;
-  creditsGranted: number;
-  /** Activates monthly refill grant for the user. */
-  activatesMonthlyRefill: boolean;
-  label: string;
 }

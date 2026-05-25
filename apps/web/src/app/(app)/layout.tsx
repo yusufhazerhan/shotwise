@@ -5,25 +5,30 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { CreditsProvider } from "@/components/credit-balance";
 import { getCurrentUser } from "@/lib/auth";
-import { getBalance } from "@shotwise/credits";
+import { getBalance, hasLifetimeAccess } from "@shotwise/credits";
 import { queries, getDb } from "@shotwise/db";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
-  if (!user) redirect("/sign-in");
+  if (!user) redirect("/studio");
 
   let balance = 0;
-  let monthlyRefillActive = false;
+  let lifetimeActive = false;
   try {
-    balance = await getBalance(user.id);
-    const dbUser = await queries.getUserById(getDb(), user.id);
-    monthlyRefillActive = dbUser?.monthlyRefillActive ?? false;
+    const db = getDb();
+    const [nextBalance, dbUser, paidLifetime] = await Promise.all([
+      getBalance(user.id, db),
+      queries.getUserById(db, user.id),
+      hasLifetimeAccess(user.id, db),
+    ]);
+    balance = nextBalance;
+    lifetimeActive = paidLifetime || (dbUser?.monthlyRefillActive ?? false);
   } catch {
     // First-time signup race / DB unavailable: leave defaults
   }
 
   return (
-    <CreditsProvider initialBalance={balance} initialActive={monthlyRefillActive}>
+    <CreditsProvider initialBalance={balance} initialLifetimeActive={lifetimeActive}>
       <AppShell>{children}</AppShell>
     </CreditsProvider>
   );

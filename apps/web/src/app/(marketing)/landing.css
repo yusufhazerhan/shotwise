@@ -1,4 +1,4 @@
-/* Landing-specific styles (ported from desing/shortwise/landing.html). */
+/* Landing-specific styles. */
 
 .hero { padding: 88px 0 56px; position: relative; }
 .hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 64px; align-items: center; }

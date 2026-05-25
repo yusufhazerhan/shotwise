@@ -9,6 +9,7 @@ export function ScreenshotList({
   onSelect,
   onDrop,
   onRefresh,
+  onReorder,
   projectId,
 }: {
   screenshots: Screenshot[];
@@ -16,6 +17,7 @@ export function ScreenshotList({
   onSelect: (id: string) => void;
   onDrop: (files: File[]) => Promise<void>;
   onRefresh: () => Promise<void>;
+  onReorder: (screenshots: Screenshot[]) => Promise<void>;
   projectId: string;
 }) {
   const [busy, setBusy] = React.useState(false);
@@ -35,6 +37,16 @@ export function ScreenshotList({
     await onRefresh();
   }
 
+  async function move(id: string, dir: -1 | 1) {
+    const index = screenshots.findIndex((s) => s.id === id);
+    const nextIndex = index + dir;
+    if (index < 0 || nextIndex < 0 || nextIndex >= screenshots.length) return;
+    const next = [...screenshots];
+    const [item] = next.splice(index, 1);
+    next.splice(nextIndex, 0, item!);
+    await onReorder(next);
+  }
+
   return (
     <>
       <DropZone
@@ -42,7 +54,7 @@ export function ScreenshotList({
         accept={{ "image/png": [".png"], "image/jpeg": [".jpg", ".jpeg"], "image/webp": [".webp"] }}
         maxSize={20 * 1024 * 1024}
         multiple
-        onDrop={(files) => handleFiles(files as File[])}
+        onDrop={(files: File[]) => handleFiles(files)}
       >
         <span className="plus">+</span>{busy ? " Uploading…" : " Add screenshot"}
       </DropZone>
@@ -71,6 +83,10 @@ export function ScreenshotList({
             >
               ×
             </button>
+            <div className="shot-move">
+              <button title="Move up" onClick={(e) => { e.stopPropagation(); void move(s.id, -1); }}>↑</button>
+              <button title="Move down" onClick={(e) => { e.stopPropagation(); void move(s.id, 1); }}>↓</button>
+            </div>
           </div>
         ))}
       </div>

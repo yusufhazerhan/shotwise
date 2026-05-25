@@ -6,6 +6,11 @@ import { cn } from "./cn.js";
 export interface DropZoneProps extends DropzoneOptions {
   className?: string;
   children?: React.ReactNode;
+  accept?: DropzoneOptions["accept"];
+  maxSize?: DropzoneOptions["maxSize"];
+  multiple?: DropzoneOptions["multiple"];
+  onDrop?: (acceptedFiles: File[]) => void;
+  disabled?: DropzoneOptions["disabled"];
   /** When true, renders a slim "+ Add screenshot" style. */
   compact?: boolean;
 }

@@ -1,7 +1,5 @@
 /**
- * Design hand-off reference: shows every UI primitive and lists every
- * `data-slot` selector in the app. Claude Design targets these.
- *
+ * Design reference: shows UI primitives and `data-slot` selectors.
  * Visit at /_dev/preview (no auth wall, dev-only).
  */
 import {
@@ -32,8 +30,6 @@ const SLOTS = [
   "how-it-works", "how-step", "features-grid", "cta",
   // Pricing
   "pricing", "plan-card", "faq",
-  // Auth
-  "auth-layout", "auth-form", "auth-success", "auth-error",
   // App shell
   "app-shell", "app-sidebar", "app-logo", "app-nav", "app-main", "app-topbar", "app-content",
   "credit-balance",
@@ -46,14 +42,9 @@ const SLOTS = [
   "screenshot-list", "screenshot-list-item",
   "settings-panel",
   "live-preview", "pixel-preview",
-  // Wizard
-  "wizard-shell", "wizard-progress", "wizard-footer",
-  "wizard-step-1", "wizard-step-2", "wizard-step-3", "wizard-step-3-error",
-  "wizard-step-4", "wizard-review-card", "title-suggestions", "title-suggestion",
-  "wizard-step-5", "lang-grid",
-  "wizard-step-6", "wizard-insufficient", "wizard-export-progress", "wizard-export-success",
-  // Credits
-  "credits-view", "credits-buy", "credits-status", "credits-ledger",
+  // Studio
+  "studio-shell", "studio-gallery", "studio-canvas", "studio-inspector",
+  "template-card", "locale-checks", "device-checks",
   // Account
   "account-page",
   // Primitives

@@ -11,7 +11,7 @@ export const GET = defineRoute({ auth: true }, async ({ user }) => {
 
 const CreateBody = z.object({
   name: z.string().min(1).max(120).optional(),
-  mode: z.enum(["manual", "wizard"]).default("manual"),
+  mode: z.literal("manual").default("manual"),
   appMetadata: z.record(z.unknown()).optional(),
 });
 

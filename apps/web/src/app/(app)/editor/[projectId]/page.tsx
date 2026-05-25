@@ -1,3 +1,4 @@
+import * as React from "react";
 import { redirect } from "next/navigation";
 import { EditorShell } from "./editor-shell";
 import { requireUser } from "@/lib/auth";
@@ -17,9 +18,16 @@ export default async function EditorPage(props: { params: Promise<{ projectId: s
       appMetadata: {},
       config: {
         themeId: "cream",
-        canvasPresetId: "iphone67",
+        canvasPresetId: "iphone69",
         languages: ["en"],
         defaultPosition: "top",
+        editor: {
+          canvasPresetId: "iphone69",
+          languages: ["en"],
+          themeId: "cream",
+          layoutPreset: "single",
+          defaultFont: "Fraunces, Georgia, serif",
+        },
       },
     });
     redirect(`/editor/${project.id}`);

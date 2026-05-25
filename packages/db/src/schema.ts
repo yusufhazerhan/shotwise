@@ -3,7 +3,7 @@
  *
  * Includes Better-Auth required tables (users, sessions, accounts, verifications)
  * and Shotwise domain tables (projects, screenshots, export_jobs, credit_ledger,
- * paddle_customers, webhooks_log).
+ * payment metadata, webhooks_log).
  */
 import {
   pgTable,
@@ -32,7 +32,8 @@ export const users = pgTable("users", {
 
   // Shotwise extensions
   monthlyRefillActive: boolean("monthly_refill_active").notNull().default(false),
-  paddleCustomerId: text("paddle_customer_id"),
+  paymentCustomerId: text("payment_customer_id"),
+  signupIp: text("signup_ip"),
 
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -94,7 +95,7 @@ export const verifications = pgTable("verifications", {
 // Shotwise domain
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const projectModeEnum = pgEnum("project_mode", ["manual", "wizard"]);
+export const projectModeEnum = pgEnum("project_mode", ["manual"]);
 
 export const projects = pgTable(
   "projects",
@@ -139,7 +140,7 @@ export const screenshots = pgTable(
     /** Localized per-locale: { en: {title, accent}, tr: {title, accent}, ... } */
     localized: jsonb("localized").$type<Record<string, unknown>>().default({}),
 
-    /** Gemini Vision output. */
+    /** Draft metadata from legacy screenshot analysis or importer flows. */
     aiAnalysis: jsonb("ai_analysis").$type<Record<string, unknown>>(),
 
     /** Per-screen render overrides (font, colors, etc.). */
@@ -177,6 +178,9 @@ export const exportJobs = pgTable(
     creditsDebited: integer("credits_debited").notNull().default(0),
 
     languages: jsonb("languages").$type<string[]>().notNull().default([]),
+    devicePresetIds: jsonb("device_preset_ids").$type<string[]>().notNull().default([]),
+    includeFeatureGraphic: boolean("include_feature_graphic").notNull().default(false),
+    selectionMatrix: jsonb("selection_matrix").$type<Record<string, unknown>>(),
 
     progress: jsonb("progress").$type<Record<string, unknown>>().default({}),
     /** ZIP S3 key once succeeded. */
@@ -236,7 +240,7 @@ export const webhooksLog = pgTable(
   "webhooks_log",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    source: text("source").notNull(), // "paddle"
+    source: text("source").notNull(),
     eventId: text("event_id").notNull(),
     eventType: text("event_type").notNull(),
     payload: jsonb("payload").notNull(),

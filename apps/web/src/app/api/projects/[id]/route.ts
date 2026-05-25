@@ -12,7 +12,7 @@ export const GET = defineRoute({ auth: true }, async ({ user, params }) => {
 
 const PatchBody = z.object({
   name: z.string().min(1).max(120).optional(),
-  mode: z.enum(["manual", "wizard"]).optional(),
+  mode: z.literal("manual").optional(),
   appMetadata: z.record(z.unknown()).optional(),
   config: z.record(z.unknown()).optional(),
 });

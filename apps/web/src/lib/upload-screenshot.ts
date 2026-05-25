@@ -7,44 +7,17 @@ export async function uploadScreenshot(opts: {
   file: File;
   order: number;
 }) {
-  // 1) Request a signed URL
-  const sigRes = await fetch(`/api/projects/${opts.projectId}/screenshots/upload-url`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      filename: opts.file.name,
-      mime: opts.file.type as "image/png" | "image/jpeg" | "image/webp",
-      order: opts.order,
-      size: opts.file.size,
-    }),
-  });
-  if (!sigRes.ok) {
-    throw new Error(`Upload URL request failed: ${sigRes.status}`);
-  }
-  const { screenshotId, uploadUrl } = (await sigRes.json()) as {
-    screenshotId: string;
-    uploadUrl: string;
-    key: string;
-  };
+  const form = new FormData();
+  form.set("file", opts.file);
+  form.set("order", String(opts.order));
 
-  // 2) PUT the file directly to S3 (MinIO in dev)
-  const putRes = await fetch(uploadUrl, {
-    method: "PUT",
-    headers: { "Content-Type": opts.file.type },
-    body: opts.file,
-  });
-  if (!putRes.ok) {
-    throw new Error(`S3 PUT failed: ${putRes.status}`);
-  }
-
-  // 3) Confirm
-  const confirm = await fetch(`/api/projects/${opts.projectId}/screenshots`, {
+  const res = await fetch(`/api/projects/${opts.projectId}/screenshots/upload-file`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ screenshotId, size: opts.file.size }),
+    body: form,
   });
-  if (!confirm.ok) {
-    throw new Error(`Confirm failed: ${confirm.status}`);
+  if (!res.ok) {
+    throw new Error(`Screenshot upload failed: ${res.status}`);
   }
+  const { screenshotId } = (await res.json()) as { screenshotId: string };
   return { screenshotId };
 }

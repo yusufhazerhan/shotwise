@@ -14,7 +14,6 @@ COPY packages/core/package.json packages/core/
 COPY packages/types/package.json packages/types/
 COPY packages/db/package.json packages/db/
 COPY packages/auth/package.json packages/auth/
-COPY packages/ai/package.json packages/ai/
 COPY packages/storage/package.json packages/storage/
 COPY packages/billing/package.json packages/billing/
 COPY packages/credits/package.json packages/credits/

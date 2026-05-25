@@ -1,8 +1,6 @@
 import type { Config } from "tailwindcss";
 
-/**
- * Shotwise — design tokens (ported from desing/shortwise/tailwind.config.ts).
- */
+/** Shotwise design tokens. */
 const config: Config = {
   darkMode: ["class"],
   content: [

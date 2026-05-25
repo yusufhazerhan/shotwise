@@ -1,7 +1,18 @@
 {
   "name": "@shotwise/core",
   "version": "0.0.1",
-  "description": "Native SVG + Sharp image generation engine for App Store marketing screenshots",
+  "description": "Native SVG and Sharp renderer for App Store, Google Play, iPhone, Android, iPad, and localized marketing screenshots.",
+  "keywords": [
+    "app-store-screenshots",
+    "google-play-screenshots",
+    "screenshot-renderer",
+    "sharp",
+    "svg",
+    "iphone-mockup",
+    "android-mockup",
+    "ipad-screenshots",
+    "aso"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

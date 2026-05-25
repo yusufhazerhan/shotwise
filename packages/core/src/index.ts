@@ -8,6 +8,7 @@
 export { render } from "./render.js";
 export { renderBatch, renderWithTheme } from "./batch.js";
 export type { BatchRenderResult } from "./batch.js";
+export { buildSceneSvg, createDefaultScene, normalizeSceneScreenshotSlots, renderScene } from "./scene.js";
 
 export { wrapText, escapeXml } from "./wrap.js";
 export {
@@ -42,4 +43,17 @@ export type {
   ScreenSpec,
   TitlePosition,
   ShadowIntensity,
+  StoreScreenshotScene,
+  SceneAdvancedOverrides,
+  SceneBackground,
+  SceneCallout,
+  SceneDeviceKind,
+  SceneDeviceOptions,
+  SceneFrameStyle,
+  SceneLayoutPreset,
+  SceneRenderOptions,
+  SceneScreenshotTransform,
+  SceneScreenshotSlot,
+  SceneTextBlock,
+  SceneTextRole,
 } from "./types.js";

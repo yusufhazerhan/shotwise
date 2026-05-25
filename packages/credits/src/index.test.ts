@@ -10,8 +10,8 @@ describe("credits domain", () => {
   });
 
   it("DuplicateGrantError carries idempotency key", () => {
-    const err = new DuplicateGrantError("paddle:abc");
-    expect(err.idempotencyKey).toBe("paddle:abc");
+    const err = new DuplicateGrantError("purchase:abc");
+    expect(err.idempotencyKey).toBe("purchase:abc");
   });
 
   it("DEFAULTS resolves from env or sane fallbacks", () => {

@@ -28,9 +28,9 @@ export class DuplicateGrantError extends Error {
 
 /** Resolve env-driven defaults with safe fallbacks. */
 export const DEFAULTS = {
-  signupTrial: parseInt(process.env.CREDITS_SIGNUP_TRIAL ?? "5", 10),
+  signupTrial: parseInt(process.env.CREDITS_SIGNUP_TRIAL ?? "20", 10),
   starterPack: parseInt(process.env.CREDITS_STARTER_PACK ?? "100", 10),
-  topup: parseInt(process.env.CREDITS_TOPUP ?? "50", 10),
+  topup: parseInt(process.env.CREDITS_TOPUP ?? "100", 10),
   monthlyRefill: parseInt(process.env.CREDITS_MONTHLY_REFILL ?? "20", 10),
 };
 
@@ -125,6 +125,15 @@ export async function getBalance(userId: string, db: Database = getDb()): Promis
   return result[0]?.balance ?? 0;
 }
 
+export async function hasLifetimeAccess(userId: string, db: Database = getDb()): Promise<boolean> {
+  const rows = await db
+    .select({ id: creditLedger.id })
+    .from(creditLedger)
+    .where(and(eq(creditLedger.userId, userId), eq(creditLedger.reason, "purchase_starter")))
+    .limit(1);
+  return rows.length > 0;
+}
+
 /** Idempotent: same userId + signup_trial dedupes via idempotency key. */
 export async function grantSignupTrial(userId: string, db?: Database) {
   try {
@@ -159,11 +168,11 @@ export async function grantMonthlyRefill(userId: string, monthKey: string, db?: 
   }
 }
 
-/** Credits a user after a successful Paddle purchase. */
+/** Credits a user after a successful external purchase in legacy server builds. */
 export async function grantPurchase(opts: {
   userId: string;
   kind: "starter_pack" | "topup_50";
-  paddleEventId: string;
+  purchaseEventId: string;
   db?: Database;
 }) {
   const amount = opts.kind === "starter_pack" ? DEFAULTS.starterPack : DEFAULTS.topup;
@@ -173,8 +182,8 @@ export async function grantPurchase(opts: {
       userId: opts.userId,
       amount,
       reason,
-      idempotencyKey: `paddle:${opts.paddleEventId}`,
-      metadata: { kind: opts.kind, paddleEventId: opts.paddleEventId },
+      idempotencyKey: `purchase:${opts.purchaseEventId}`,
+      metadata: { kind: opts.kind, purchaseEventId: opts.purchaseEventId },
       db: opts.db,
     });
     return { granted: true, amount };

@@ -20,7 +20,7 @@ export default async function ProjectDetailPage(props: { params: Promise<{ id: s
           <p style={{ color: "var(--muted-fg)", margin: 0 }}>{project.mode} mode</p>
         </div>
         <Link
-          href={`/${project.mode === "wizard" ? "wizard" : "editor"}/${project.id}`}
+          href={`/editor/${project.id}`}
           className="sw-btn sw-btn--primary"
         >
           Open editor
